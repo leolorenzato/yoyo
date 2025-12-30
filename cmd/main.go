@@ -21,6 +21,7 @@ func main() {
 	defer f.Close()
 
 	configFile := flag.String("config", "config_path", "path to config file")
+	styleFile := flag.String("style", "style_path", "path to style file")
 	flag.Parse()
 
 	var config Config
@@ -28,9 +29,6 @@ func main() {
 		log.Printf("failed to load config file %s", *configFile)
 		os.Exit(1)
 	}
-
-	styleFile := flag.String("style", "style_path", "path to style file")
-	flag.Parse()
 
 	var style Style
 	if _, err := toml.DecodeFile(*styleFile, &style); err != nil {

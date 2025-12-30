@@ -22,22 +22,22 @@ type Cmd struct {
 
 func NewModel(config Config, style Style) Model {
 	palette := Base16Palette{
-		lipgloss.Color(style.colors.base00),
-		lipgloss.Color(style.colors.base01),
-		lipgloss.Color(style.colors.base02),
-		lipgloss.Color(style.colors.base03),
-		lipgloss.Color(style.colors.base04),
-		lipgloss.Color(style.colors.base05),
-		lipgloss.Color(style.colors.base06),
-		lipgloss.Color(style.colors.base07),
-		lipgloss.Color(style.colors.base08),
-		lipgloss.Color(style.colors.base09),
-		lipgloss.Color(style.colors.base0A),
-		lipgloss.Color(style.colors.base0B),
-		lipgloss.Color(style.colors.base0C),
-		lipgloss.Color(style.colors.base0D),
-		lipgloss.Color(style.colors.base0E),
-		lipgloss.Color(style.colors.base0F),
+		lipgloss.Color(style.Colors.Base00),
+		lipgloss.Color(style.Colors.Base01),
+		lipgloss.Color(style.Colors.Base02),
+		lipgloss.Color(style.Colors.Base03),
+		lipgloss.Color(style.Colors.Base04),
+		lipgloss.Color(style.Colors.Base05),
+		lipgloss.Color(style.Colors.Base06),
+		lipgloss.Color(style.Colors.Base07),
+		lipgloss.Color(style.Colors.base08),
+		lipgloss.Color(style.Colors.Base09),
+		lipgloss.Color(style.Colors.Base0A),
+		lipgloss.Color(style.Colors.Base0B),
+		lipgloss.Color(style.Colors.Base0C),
+		lipgloss.Color(style.Colors.Base0D),
+		lipgloss.Color(style.Colors.Base0E),
+		lipgloss.Color(style.Colors.Base0F),
 	}
 
 	selectedStyle := lipgloss.NewStyle().
@@ -48,16 +48,16 @@ func NewModel(config Config, style Style) Model {
 		Foreground(palette.Base05)
 
 	var cmds []Cmd
-	for _, cmd := range config.cmds {
+	for _, cmd := range config.Cmds {
 		cmds = append(cmds, Cmd{
-			name: cmd.name,
-			icon: cmd.icon,
-			cmd:  cmd.cmd,
+			name: cmd.Name,
+			icon: cmd.Icon,
+			cmd:  cmd.Cmd,
 		})
 	}
 
 	return Model{
-		title:         config.general.title,
+		title:         config.General.Title,
 		cursor:        0,
 		cmds:          cmds,
 		palette:       palette,
