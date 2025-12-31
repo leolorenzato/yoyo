@@ -36,7 +36,10 @@ func main() {
 		os.Exit(1)
 	}
 
-	p := tea.NewProgram(NewModel(config, style))
+	p := tea.NewProgram(
+		NewModel(config, style),
+		tea.WithAltScreen(),
+	)
 	if _, err := p.Run(); err != nil {
 		log.Printf("Error: %v", err)
 		os.Exit(1)

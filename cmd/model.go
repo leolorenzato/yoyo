@@ -9,6 +9,9 @@ type Model struct {
 	title         string
 	cursor        int
 	cmds          []Cmd
+	searchEnabled bool
+	search        string
+	filteredCmds  []Cmd
 	palette       Base16Palette
 	selectedStyle lipgloss.Style
 	normalStyle   lipgloss.Style
@@ -60,6 +63,9 @@ func NewModel(config Config, style Style) Model {
 		title:         config.General.Title,
 		cursor:        0,
 		cmds:          cmds,
+		searchEnabled: true,
+		search:        "",
+		filteredCmds:  cmds,
 		palette:       palette,
 		selectedStyle: selectedStyle,
 		normalStyle:   normalStyle,
