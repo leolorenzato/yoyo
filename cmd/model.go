@@ -5,16 +5,25 @@ import (
 	"github.com/charmbracelet/lipgloss"
 )
 
+const (
+	defaulHorizPadding int = 2
+	defaulVertPadding  int = 0
+)
+
 type Model struct {
-	title         string
-	cursor        int
-	cmds          []Cmd
-	searchEnabled bool
-	search        string
-	filteredCmds  []Cmd
-	palette       Base16Palette
-	selectedStyle lipgloss.Style
-	normalStyle   lipgloss.Style
+	title                 string
+	cursor                int
+	cmds                  []Cmd
+	searchEnabled         bool
+	search                string
+	filteredCmds          []Cmd
+	contentBorderStyle    lipgloss.Style
+	titleStyle            lipgloss.Style
+	searchStyle           lipgloss.Style
+	menuStyle             lipgloss.Style
+	selectedMenuTextStyle lipgloss.Style
+	normalTextMenuStyle   lipgloss.Style
+	footerStyle           lipgloss.Style
 }
 
 type Cmd struct {
@@ -43,12 +52,39 @@ func NewModel(config Config, style Style) Model {
 		lipgloss.Color(style.Colors.Base0F),
 	}
 
-	selectedStyle := lipgloss.NewStyle().
+	contentBorderStyle := lipgloss.NewStyle().
+		Border(lipgloss.RoundedBorder()).
+		BorderForeground(palette.Base0D).
+		Padding(defaulVertPadding, defaulHorizPadding)
+
+	titleStyle := lipgloss.NewStyle().
+		Bold(true).
+		Foreground(palette.Base0E).
+		Align(lipgloss.Center).
+		Padding(defaulVertPadding, defaulHorizPadding)
+
+	searchStyle := lipgloss.NewStyle().
+		Foreground(palette.Base05).
+		Border(lipgloss.RoundedBorder()).
+		BorderForeground(palette.Base03).
+		Padding(defaulVertPadding, defaulHorizPadding)
+
+	menuStyle := lipgloss.NewStyle().
+		Border(lipgloss.RoundedBorder()).
+		BorderForeground(palette.Base03).
+		Padding(defaulVertPadding, defaulHorizPadding)
+
+	selectedMenuTextStyle := lipgloss.NewStyle().
 		Foreground(palette.Base0B).
 		Bold(true)
 
-	normalStyle := lipgloss.NewStyle().
+	normalTextMenuStyle := lipgloss.NewStyle().
 		Foreground(palette.Base05)
+
+	footerStyle := lipgloss.NewStyle().
+		Foreground(palette.Base04).
+		Align(lipgloss.Center).
+		Padding(defaulVertPadding, defaulHorizPadding)
 
 	var cmds []Cmd
 	for _, cmd := range config.Cmds {
@@ -60,15 +96,19 @@ func NewModel(config Config, style Style) Model {
 	}
 
 	return Model{
-		title:         config.General.Title,
-		cursor:        0,
-		cmds:          cmds,
-		searchEnabled: true,
-		search:        "",
-		filteredCmds:  cmds,
-		palette:       palette,
-		selectedStyle: selectedStyle,
-		normalStyle:   normalStyle,
+		title:                 config.General.Title,
+		cursor:                0,
+		cmds:                  cmds,
+		searchEnabled:         true,
+		search:                "",
+		filteredCmds:          cmds,
+		contentBorderStyle:    contentBorderStyle,
+		titleStyle:            titleStyle,
+		searchStyle:           searchStyle,
+		menuStyle:             menuStyle,
+		selectedMenuTextStyle: selectedMenuTextStyle,
+		normalTextMenuStyle:   normalTextMenuStyle,
+		footerStyle:           footerStyle,
 	}
 }
 

@@ -10,93 +10,25 @@ import (
 	"github.com/charmbracelet/x/term"
 )
 
-const defaultWidth int = 80
+const minTermWidth int = 80
 
 func (m Model) View() string {
-	physicalWidth, _, err := term.GetSize(os.Stdout.Fd())
-	if err != nil {
-		physicalWidth = defaultWidth
-		log.Printf(
-			"failed to get terminal size, use default size of %d px",
-			physicalWidth,
-		)
+	termWidth := getTermWidth()
 
-	}
-
-	if physicalWidth < defaultWidth {
+	if termWidth < minTermWidth {
 		return "terminal size too small"
 	}
 
-	titleStyle := lipgloss.NewStyle().
-		Bold(true).
-		Foreground(m.palette.Base0E).
-		Align(lipgloss.Center).
-		Padding(0, 2)
+	contentWidth := getStyleWidth(m.contentBorderStyle, termWidth)
 
-	searchStyle := lipgloss.NewStyle().
-		Foreground(m.palette.Base05).
-		Border(lipgloss.RoundedBorder()).
-		BorderForeground(m.palette.Base03).
-		Padding(0, 2)
+	title := m.renderTitle(contentWidth)
+	search := m.renderSearch(contentWidth)
+	menu := m.renderMenu(contentWidth)
+	footer := m.renderFooter(contentWidth)
 
-	menuStyle := lipgloss.NewStyle().
-		Border(lipgloss.RoundedBorder()).
-		BorderForeground(m.palette.Base03).
-		Padding(0, 2)
-
-	footerStyle := lipgloss.NewStyle().
-		Foreground(m.palette.Base04).
-		Align(lipgloss.Center).
-		Padding(0, 2)
-
-	borderStyle := lipgloss.NewStyle().
-		Border(lipgloss.RoundedBorder()).
-		BorderForeground(m.palette.Base0D).
-		Padding(0, 2)
-
-	borderHorizSize := borderStyle.GetBorderLeftSize() +
-		borderStyle.GetBorderRightSize()
-	borderHorizPadding := borderStyle.GetPaddingLeft() +
-		borderStyle.GetPaddingRight()
-	viewWidth := physicalWidth - borderHorizSize - borderHorizPadding
-
-	titleWidth := viewWidth -
-		titleStyle.GetBorderLeftSize() -
-		titleStyle.GetBorderRightSize() -
-		titleStyle.GetPaddingLeft() -
-		titleStyle.GetPaddingRight()
-
-	searchWidth := viewWidth -
-		searchStyle.GetBorderLeftSize() -
-		searchStyle.GetBorderRightSize() -
-		searchStyle.GetPaddingLeft() -
-		searchStyle.GetPaddingRight()
-
-	menuWidth := viewWidth -
-		menuStyle.GetBorderLeftSize() -
-		menuStyle.GetBorderRightSize() -
-		menuStyle.GetPaddingLeft() -
-		menuStyle.GetPaddingRight()
-
-	footerWidth := viewWidth -
-		footerStyle.GetBorderLeftSize() -
-		footerStyle.GetBorderRightSize() -
-		footerStyle.GetPaddingLeft() -
-		footerStyle.GetPaddingRight()
-
-	titleText := m.title
-	searchText := "🔍 " + m.search
-	menuText := lipgloss.JoinVertical(lipgloss.Left, m.renderMenu(menuWidth)...)
-	footerText := "• ↑/↓ to navigate • enter to select • ctrl+c to quit"
-
-	title := titleStyle.Width(titleWidth).Render(titleText)
-	search := searchStyle.Width(searchWidth).Render(searchText)
-	menu := menuStyle.Width(menuWidth).Render(menuText)
-	footer := footerStyle.Width(footerWidth).Render(footerText)
-
-	var content string
+	var contentText string
 	if m.searchEnabled {
-		content = lipgloss.JoinVertical(
+		contentText = lipgloss.JoinVertical(
 			lipgloss.Left,
 			title,
 			"",
@@ -106,7 +38,7 @@ func (m Model) View() string {
 			footer,
 		)
 	} else {
-		content = lipgloss.JoinVertical(
+		contentText = lipgloss.JoinVertical(
 			lipgloss.Left,
 			title,
 			"",
@@ -116,23 +48,45 @@ func (m Model) View() string {
 		)
 	}
 
-	border := borderStyle.Width(viewWidth).Render(content)
+	content := m.contentBorderStyle.Width(contentWidth).Render(contentText)
 
 	return lipgloss.PlaceHorizontal(
-		physicalWidth,
+		termWidth,
 		lipgloss.Center,
-		border,
+		content,
 	) + "\n"
 }
 
-func (m Model) renderMenu(menuWidth int) []string {
-	selectedStyle := m.selectedStyle
-	normalStyle := m.normalStyle
+func (m Model) renderTitle(contentWidth int) string {
+	titleWidth := getStyleWidth(m.titleStyle, contentWidth)
+	titleText := truncate(m.title, titleWidth, "...")
+
+	return m.titleStyle.Width(titleWidth).Render(titleText)
+}
+
+func (m Model) renderSearch(contentWidth int) string {
+	searchWidth := getStyleWidth(m.searchStyle, contentWidth)
+	searchText := truncate("🔍 "+m.search, searchWidth, "...")
+
+	return m.searchStyle.Width(searchWidth).Render(searchText)
+}
+
+func (m Model) renderMenu(contentWidth int) string {
+	menuWidth := getStyleWidth(m.menuStyle, contentWidth)
+	menuText := lipgloss.JoinVertical(lipgloss.Left, m.renderMenuItems(menuWidth)...)
+	menuText = truncate(menuText, menuWidth, "...")
+
+	return m.menuStyle.Width(menuWidth).Render(menuText)
+}
+
+func (m Model) renderMenuItems(menuWidth int) []string {
+	selectedStyle := m.selectedMenuTextStyle
+	normalStyle := m.normalTextMenuStyle
 
 	items := make([]string, len(m.filteredCmds))
 	for i, choice := range m.filteredCmds {
 		line := choice.icon + " " + choice.name
-		line = ansi.Truncate(line, menuWidth, "...")
+		line = truncate(line, menuWidth, "...")
 		if i == m.cursor {
 			items[i] = selectedStyle.Render(line)
 		} else {
@@ -140,6 +94,42 @@ func (m Model) renderMenu(menuWidth int) []string {
 		}
 	}
 	return items
+}
+
+func (m Model) renderFooter(contentWidth int) string {
+	footerWidth := getStyleWidth(m.footerStyle, contentWidth)
+	footerText := truncate(
+		"• ↑/↓ to navigate • enter to select • ctrl+c to quit",
+		footerWidth,
+		"...",
+	)
+
+	return m.footerStyle.Width(footerWidth).Render(footerText)
+}
+
+func getTermWidth() int {
+	termWidth, _, err := term.GetSize(os.Stdout.Fd())
+	if err != nil {
+		termWidth = minTermWidth
+		log.Printf(
+			"failed to get terminal size, use default size of %d px",
+			termWidth,
+		)
+	}
+
+	return termWidth
+}
+
+func getStyleWidth(s lipgloss.Style, outerWidth int) int {
+	return outerWidth -
+		s.GetBorderLeftSize() -
+		s.GetBorderRightSize() -
+		s.GetPaddingLeft() -
+		s.GetPaddingRight()
+}
+
+func truncate(s string, length int, tail string) string {
+	return ansi.Truncate(s, length, tail)
 }
 
 func filterCmds(cmds []Cmd, query string) []Cmd {
