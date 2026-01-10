@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"io"
 	"log"
 	"os"
 
@@ -13,15 +14,15 @@ import (
 const appName string = "yoyo"
 
 func main() {
-	f, err := tea.LogToFile("./log/debug.log", "debug")
-	if err != nil {
-		fmt.Println("failed to setup the logger:", err)
-		os.Exit(1)
-	}
-	defer f.Close()
-
-	configFile := flag.String("config", "config_path", "path to config file")
+	configFile := flag.String("c", "config_path", "path to config file")
+	debug := flag.Bool("debug", false, "enable debug logging")
 	flag.Parse()
+
+	if *debug {
+		setupLogger()
+	} else {
+		log.SetOutput(io.Discard)
+	}
 
 	var config Config
 	if _, err := toml.DecodeFile(*configFile, &config); err != nil {
@@ -37,4 +38,13 @@ func main() {
 		log.Printf("Error: %v", err)
 		os.Exit(1)
 	}
+}
+
+func setupLogger() {
+	f, err := tea.LogToFile("./log/debug.log", "debug")
+	if err != nil {
+		fmt.Println("failed to setup the logger:", err)
+		os.Exit(1)
+	}
+	defer f.Close()
 }
