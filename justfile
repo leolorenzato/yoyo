@@ -1,2 +1,2 @@
 run:
-    go run ./cmd --config ./config.toml --style ./style.toml
+    go run ./cmd --config ./config.toml

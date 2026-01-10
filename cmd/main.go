@@ -21,7 +21,6 @@ func main() {
 	defer f.Close()
 
 	configFile := flag.String("config", "config_path", "path to config file")
-	styleFile := flag.String("style", "style_path", "path to style file")
 	flag.Parse()
 
 	var config Config
@@ -30,14 +29,8 @@ func main() {
 		os.Exit(1)
 	}
 
-	var style Style
-	if _, err := toml.DecodeFile(*styleFile, &style); err != nil {
-		log.Printf("failed to load style file %s", *styleFile)
-		os.Exit(1)
-	}
-
 	p := tea.NewProgram(
-		NewModel(config, style),
+		NewModel(config),
 		tea.WithAltScreen(),
 	)
 	if _, err := p.Run(); err != nil {

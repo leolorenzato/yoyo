@@ -32,57 +32,38 @@ type Cmd struct {
 	cmd  string
 }
 
-func NewModel(config Config, style Style) Model {
-	palette := Base16Palette{
-		lipgloss.Color(style.Colors.Base00),
-		lipgloss.Color(style.Colors.Base01),
-		lipgloss.Color(style.Colors.Base02),
-		lipgloss.Color(style.Colors.Base03),
-		lipgloss.Color(style.Colors.Base04),
-		lipgloss.Color(style.Colors.Base05),
-		lipgloss.Color(style.Colors.Base06),
-		lipgloss.Color(style.Colors.Base07),
-		lipgloss.Color(style.Colors.base08),
-		lipgloss.Color(style.Colors.Base09),
-		lipgloss.Color(style.Colors.Base0A),
-		lipgloss.Color(style.Colors.Base0B),
-		lipgloss.Color(style.Colors.Base0C),
-		lipgloss.Color(style.Colors.Base0D),
-		lipgloss.Color(style.Colors.Base0E),
-		lipgloss.Color(style.Colors.Base0F),
-	}
-
+func NewModel(config Config) Model {
 	contentBorderStyle := lipgloss.NewStyle().
 		Border(lipgloss.RoundedBorder()).
-		BorderForeground(palette.Base0D).
+		BorderForeground(lipgloss.Color(config.UI.ContentBorder)).
 		Padding(defaulVertPadding, defaulHorizPadding)
 
 	titleStyle := lipgloss.NewStyle().
 		Bold(true).
-		Foreground(palette.Base0E).
+		Foreground(lipgloss.Color(config.UI.Title)).
 		Align(lipgloss.Center).
 		Padding(defaulVertPadding, defaulHorizPadding)
 
 	searchStyle := lipgloss.NewStyle().
-		Foreground(palette.Base05).
+		Foreground(lipgloss.Color(config.UI.SearchText)).
 		Border(lipgloss.RoundedBorder()).
-		BorderForeground(palette.Base03).
+		BorderForeground(lipgloss.Color(config.UI.SearchBorder)).
 		Padding(defaulVertPadding, defaulHorizPadding)
 
 	menuStyle := lipgloss.NewStyle().
 		Border(lipgloss.RoundedBorder()).
-		BorderForeground(palette.Base03).
+		BorderForeground(lipgloss.Color(config.UI.MenuBorder)).
 		Padding(defaulVertPadding, defaulHorizPadding)
 
 	selectedMenuTextStyle := lipgloss.NewStyle().
-		Foreground(palette.Base0B).
+		Foreground(lipgloss.Color(config.UI.SelectedText)).
 		Bold(true)
 
 	normalTextMenuStyle := lipgloss.NewStyle().
-		Foreground(palette.Base05)
+		Foreground(lipgloss.Color(config.UI.NormalText))
 
 	footerStyle := lipgloss.NewStyle().
-		Foreground(palette.Base04).
+		Foreground(lipgloss.Color(config.UI.Footer)).
 		Align(lipgloss.Center).
 		Padding(defaulVertPadding, defaulHorizPadding)
 
