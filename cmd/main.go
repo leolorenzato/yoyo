@@ -19,7 +19,12 @@ func main() {
 	flag.Parse()
 
 	if *debug {
-		setupLogger()
+		f, err := tea.LogToFile("./log/debug.log", "debug")
+		if err != nil {
+			fmt.Println("failed to setup the logger:", err)
+			os.Exit(1)
+		}
+		defer f.Close()
 	} else {
 		log.SetOutput(io.Discard)
 	}
@@ -38,13 +43,4 @@ func main() {
 		log.Printf("Error: %v", err)
 		os.Exit(1)
 	}
-}
-
-func setupLogger() {
-	f, err := tea.LogToFile("./log/debug.log", "debug")
-	if err != nil {
-		fmt.Println("failed to setup the logger:", err)
-		os.Exit(1)
-	}
-	defer f.Close()
 }
