@@ -12,7 +12,7 @@ import (
 
 const (
 	minTermWidth  int = 80
-	minTermHeight int = 60
+	minTermHeight int = 24
 )
 
 func (m Model) View() string {
