@@ -6,7 +6,6 @@ import (
 	"strings"
 
 	"github.com/charmbracelet/lipgloss"
-	"github.com/charmbracelet/x/ansi"
 	"github.com/charmbracelet/x/term"
 )
 
@@ -93,14 +92,14 @@ func (m Model) View() string {
 
 func (m Model) renderTitle(contentWidth int) string {
 	titleWidth := getStyleMaxWidth(m.titleStyle, contentWidth)
-	titleText := truncate(m.title, titleWidth, "...")
+	titleText := m.title
 
 	return m.titleStyle.Width(titleWidth).Render(titleText)
 }
 
 func (m Model) renderSearch(contentWidth int) string {
 	searchWidth := getStyleMaxWidth(m.searchStyle, contentWidth)
-	searchText := truncate("🔍 "+m.search, searchWidth, "...")
+	searchText := "🔍 " + m.search
 
 	return m.searchStyle.Width(searchWidth).Render(searchText)
 }
@@ -123,14 +122,12 @@ func (m Model) renderMenu(maxContentWidth int, maxContentHeight int) string {
 	}
 
 	menuText := lipgloss.JoinVertical(lipgloss.Left, items...)
-	menuText = truncate(menuText, menuMaxWidth, "...")
 
 	return m.menuStyle.Width(menuMaxWidth).Height(menuMaxHeight).Render(menuText)
 }
 
 func (m Model) renderMenuItem(item Cmd, itemIndex int, maxWidth int) string {
 	line := item.icon + " " + item.name
-	line = truncate(line, maxWidth, "...")
 	if itemIndex == m.cursor {
 		return m.selectedMenuTextStyle.Render(line)
 	}
@@ -139,11 +136,7 @@ func (m Model) renderMenuItem(item Cmd, itemIndex int, maxWidth int) string {
 
 func (m Model) renderFooter(contentWidth int) string {
 	footerWidth := getStyleMaxWidth(m.footerStyle, contentWidth)
-	footerText := truncate(
-		"• ↑/↓ to navigate • enter to select • ctrl+c to quit",
-		footerWidth,
-		"...",
-	)
+	footerText := "• ↑/↓ to navigate • enter to select • ctrl+c to quit"
 
 	return m.footerStyle.Width(footerWidth).Render(footerText)
 }
@@ -177,10 +170,6 @@ func getStyleMaxHeight(s lipgloss.Style, outerHeight int) int {
 		s.GetBorderBottomSize() -
 		s.GetPaddingTop() -
 		s.GetPaddingBottom()
-}
-
-func truncate(s string, length int, tail string) string {
-	return ansi.Truncate(s, length, tail)
 }
 
 func filterCmds(cmds []Cmd, query string) []Cmd {
