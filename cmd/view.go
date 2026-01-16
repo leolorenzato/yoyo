@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"os"
+	"slices"
 	"strings"
 
 	"github.com/charmbracelet/lipgloss"
@@ -109,6 +110,7 @@ func (m Model) renderMenu(maxContentWidth int, maxContentHeight int) string {
 	menuMaxWidth := getStyleMaxWidth(m.menuStyle, maxContentWidth)
 	menuMaxHeight := getStyleMaxHeight(m.menuStyle, maxContentHeight)
 
+	// Try to render from the top
 	startItemIndex := 0
 	availableHeight := menuMaxHeight
 	var items []string
@@ -120,6 +122,24 @@ func (m Model) renderMenu(maxContentWidth int, maxContentHeight int) string {
 		}
 		items = append(items, item)
 		availableHeight -= itemHeight
+	}
+
+	// If cursor is not visible, render from cursor backwards
+	if m.cursor > len(items)-1 && m.cursor <= len(m.filteredCmds)-1 {
+		lastItemIndex := m.cursor
+		availableHeight = menuMaxHeight
+		items = []string{}
+		for i := lastItemIndex; i >= 0; i-- {
+			cmd := m.filteredCmds[i]
+			item := m.renderMenuItem(cmd, i, menuMaxWidth)
+			itemHeight := lipgloss.Height(item)
+			if availableHeight < itemHeight {
+				break
+			}
+			items = append(items, item)
+			availableHeight -= itemHeight
+		}
+		slices.Reverse(items)
 	}
 
 	menuText := lipgloss.JoinVertical(lipgloss.Left, items...)
