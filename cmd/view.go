@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/charmbracelet/lipgloss"
+	"github.com/charmbracelet/x/ansi"
 	"github.com/charmbracelet/x/term"
 )
 
@@ -47,14 +48,14 @@ func (m Model) View() string {
 	var mainContent string
 	if m.searchEnabled {
 		mainContent = lipgloss.JoinVertical(
-			lipgloss.Left,
+			lipgloss.Center,
 			title,
 			search,
 			menu,
 		)
 	} else {
 		mainContent = lipgloss.JoinVertical(
-			lipgloss.Left,
+			lipgloss.Center,
 			title,
 			menu,
 		)
@@ -185,4 +186,8 @@ func filterCmds(cmds []Cmd, query string) []Cmd {
 	}
 
 	return filtered
+}
+
+func truncate(s string, length int, tail string) string {
+	return ansi.Truncate(s, length, tail)
 }
