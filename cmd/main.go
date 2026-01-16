@@ -19,7 +19,14 @@ func main() {
 	flag.Parse()
 
 	if *debug {
-		f, err := tea.LogToFile("./log/debug.log", "debug")
+		logFilePath := "./log/debug.log"
+		err := os.Truncate(logFilePath, 0)
+		if err != nil && !os.IsNotExist(err) {
+			fmt.Println("failed to truncate log file:", err)
+			os.Exit(1)
+		}
+
+		f, err := tea.LogToFile(logFilePath, "")
 		if err != nil {
 			fmt.Println("failed to setup the logger:", err)
 			os.Exit(1)
