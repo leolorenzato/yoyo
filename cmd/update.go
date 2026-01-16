@@ -3,6 +3,7 @@ package main
 import (
 	"os"
 	"os/exec"
+	"syscall"
 
 	tea "github.com/charmbracelet/bubbletea"
 )
@@ -61,12 +62,19 @@ func launch(cmd string) tea.Cmd {
 		if shell == "" {
 			return nil
 		}
-		cmd_ := exec.Command(shell, "-lc", cmd)
-		cmd_.Stdin = nil
-		cmd_.Stdout = nil
-		cmd_.Stderr = nil
-		_ = cmd_.Start()
 
-		return nil
+		cmd_ := exec.Command(shell, "-lc", cmd)
+		cmd_.SysProcAttr = &syscall.SysProcAttr{
+			Setsid: true,
+		}
+		f, _ := os.OpenFile("/dev/null", os.O_RDWR, 0)
+		cmd_.Stdin = f
+		cmd_.Stdout = f
+		cmd_.Stderr = f
+
+		_ = cmd_.Start()
+		cmd_.Process.Release()
+
+		return tea.Quit()
 	}
 }
