@@ -85,8 +85,10 @@ func (m Model) View() string {
 		Height(contentMaxHeight).
 		Render(contentText)
 
-	return lipgloss.PlaceHorizontal(
+	return lipgloss.Place(
 		termWidth,
+		termHeight,
+		lipgloss.Center,
 		lipgloss.Center,
 		content,
 	)
