@@ -11,20 +11,19 @@ import (
 func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
+		m.termSize.Width = msg.Width
+		m.termSize.Height = msg.Height
 		return m, tea.ClearScreen
 	case tea.KeyMsg:
 		if m.searchEnabled {
 			switch msg.Type {
-
 			case tea.KeyBackspace:
 				if len(m.search) > 0 {
 					m.search = m.search[:len(m.search)-1]
 				}
-
 			case tea.KeyRunes:
 				m.search += string(msg.Runes)
 			}
-
 			m.filteredCmds = filterCmds(m.cmds, m.search)
 		}
 

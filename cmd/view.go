@@ -1,198 +1,319 @@
 package main
 
 import (
-	"log"
-	"os"
+	"fmt"
 	"slices"
 	"strings"
 
 	"github.com/charmbracelet/lipgloss"
 	"github.com/charmbracelet/x/ansi"
-	"github.com/charmbracelet/x/term"
 )
 
 const (
-	minTermWidth  int = 80
-	minTermHeight int = 24
+	minMenuHeight int = 4
 )
 
 func (m Model) View() string {
-	termWidth, termHeight := getTermSizeOrMinSize()
-
-	if termWidth < minTermWidth || termHeight < minTermHeight {
-		return "terminal size too small"
+	mainBoxAvailableSize := m.termSize
+	mainBoxContentSize, err := GetStyleContentSize(m.mainBoxStyle, mainBoxAvailableSize)
+	if err != nil {
+		return fmt.Sprintf("terminal size too small: %v", err)
+	}
+	mainBoxContentAvailableSize, err := GetStyleContentAvailableSize(m.mainBoxStyle, mainBoxAvailableSize)
+	if err != nil {
+		return fmt.Sprintf("terminal size too small: %v", err)
 	}
 
-	log.Printf("term size %d, %d px", termWidth, termHeight)
+	renderedTitle, err := m.renderTitle(mainBoxContentAvailableSize)
+	if err != nil {
+		return fmt.Sprintf("title rendering error: %v", err)
+	}
 
-	contentMaxWidth := getStyleMaxWidth(m.contentBorderStyle, termWidth)
-	contentMaxHeight := getStyleMaxHeight(m.contentBorderStyle, termHeight)
+	var renderedSearch string
 
-	title := m.renderTitle(contentMaxWidth)
-	search := m.renderSearch(contentMaxWidth)
-	footer := m.renderFooter(contentMaxWidth)
+	renderedFooter, err := m.renderFooter(mainBoxContentAvailableSize)
+	if err != nil {
+		return fmt.Sprintf("footer rendering error: %v", err)
+	}
 
-	var menuAvailableHeight int
+	var mainBoxContentFreeHeight int
 	if m.searchEnabled {
-		menuAvailableHeight = contentMaxHeight -
-			lipgloss.Height(title) -
-			lipgloss.Height(search) -
-			lipgloss.Height(footer)
+		renderedSearch, err = m.renderSearch(mainBoxContentAvailableSize)
+		if err != nil {
+			return fmt.Sprintf("search rendering error: %v", err)
+		}
+		mainBoxContentFreeHeight = mainBoxContentAvailableSize.Height -
+			lipgloss.Height(renderedTitle) -
+			lipgloss.Height(renderedSearch) -
+			lipgloss.Height(renderedFooter)
 	} else {
-		menuAvailableHeight = contentMaxHeight -
-			lipgloss.Height(title) -
-			lipgloss.Height(footer)
+		mainBoxContentFreeHeight = mainBoxContentAvailableSize.Height -
+			lipgloss.Height(renderedTitle) -
+			lipgloss.Height(renderedFooter)
+	}
+	mainBoxContentFreeSize := Size{
+		Width:  mainBoxContentAvailableSize.Width,
+		Height: mainBoxContentFreeHeight,
 	}
 
-	menu := m.renderMenu(contentMaxWidth, menuAvailableHeight)
+	menuAvailableContentSize, err := GetStyleContentAvailableSize(m.menuStyle, mainBoxContentFreeSize)
+	if err != nil {
+		return fmt.Sprintf("terminal size too small: %v", err)
+	}
+	if menuAvailableContentSize.Height < minMenuHeight {
+		err = fmt.Errorf("menu height too small")
+		return fmt.Sprintf("terminal size too small: %v", err)
+	}
+	renderedMenu, err := m.renderMenu(mainBoxContentFreeSize)
+	if err != nil {
+		return fmt.Sprintf("menu rendering error: %v", err)
+	}
 
-	var mainContent string
+	var joinedContent string
 	if m.searchEnabled {
-		mainContent = lipgloss.JoinVertical(
+		joinedContent = lipgloss.JoinVertical(
 			lipgloss.Center,
-			title,
-			search,
-			menu,
+			renderedTitle,
+			renderedSearch,
+			renderedMenu,
+			renderedFooter,
 		)
 	} else {
-		mainContent = lipgloss.JoinVertical(
+		joinedContent = lipgloss.JoinVertical(
 			lipgloss.Center,
-			title,
-			menu,
+			renderedTitle,
+			renderedMenu,
+			renderedFooter,
 		)
 	}
 
-	contentText := lipgloss.Place(
-		contentMaxWidth,
-		contentMaxHeight,
-		lipgloss.Left,
-		lipgloss.Top,
-		lipgloss.JoinVertical(
-			lipgloss.Left,
-			mainContent,
-			lipgloss.Place(
-				contentMaxWidth,
-				contentMaxHeight-lipgloss.Height(mainContent),
-				lipgloss.Left,
-				lipgloss.Bottom,
-				footer,
-			),
-		),
-	)
-
-	content := m.contentBorderStyle.
-		Width(contentMaxWidth).
-		Height(contentMaxHeight).
-		Render(contentText)
+	renderedBox := m.mainBoxStyle.
+		Width(mainBoxContentSize.Width).
+		Height(mainBoxContentSize.Height).
+		Render(joinedContent)
 
 	return lipgloss.Place(
-		termWidth,
-		termHeight,
+		mainBoxAvailableSize.Width,
+		mainBoxAvailableSize.Height,
 		lipgloss.Center,
 		lipgloss.Center,
-		content,
+		renderedBox,
 	)
 }
 
-func (m Model) renderTitle(contentWidth int) string {
-	titleWidth := getStyleMaxWidth(m.titleStyle, contentWidth)
-	titleText := m.title
+func (m Model) renderTitle(availableSize Size) (string, error) {
+	contentSize, err := GetStyleContentSize(m.titleStyle, availableSize)
+	if err != nil {
+		return "", err
+	}
+	availableContentSize, err := GetStyleContentAvailableSize(m.titleStyle, availableSize)
+	if err != nil {
+		return "", err
+	}
+	truncText := truncate(stripNonSpaceWhitespace(m.title), availableContentSize.Width, "")
 
-	return m.titleStyle.Width(titleWidth).Render(titleText)
+	return (m.titleStyle.
+		Width(contentSize.Width).
+		Render(truncText)), nil
 }
 
-func (m Model) renderSearch(contentWidth int) string {
-	searchWidth := getStyleMaxWidth(m.searchStyle, contentWidth)
-	searchText := "🔍 " + m.search
+func (m Model) renderSearch(availableSize Size) (string, error) {
+	text := "🔍 " + m.search
+	contentSize, err := GetStyleContentSize(m.searchStyle, availableSize)
+	if err != nil {
+		return "", err
+	}
+	availableContentSize, err := GetStyleContentAvailableSize(m.searchStyle, availableSize)
+	if err != nil {
+		return "", err
+	}
+	truncText := truncate(stripNonSpaceWhitespace(text), availableContentSize.Width, "...")
 
-	return m.searchStyle.Width(searchWidth).Render(searchText)
+	return (m.searchStyle.
+		Width(contentSize.Width).
+		Render(truncText)), nil
 }
 
-func (m Model) renderMenu(maxContentWidth int, maxContentHeight int) string {
-	menuMaxWidth := getStyleMaxWidth(m.menuStyle, maxContentWidth)
-	menuMaxHeight := getStyleMaxHeight(m.menuStyle, maxContentHeight)
+func (m Model) renderMenu(availableSize Size) (string, error) {
+	contentSize, err := GetStyleContentSize(m.menuStyle, availableSize)
+	if err != nil {
+		return "", err
+	}
+	availableContentSize, err := GetStyleContentAvailableSize(m.menuStyle, availableSize)
+	if err != nil {
+		return "", err
+	}
 
-	// Try to render from the top
-	startItemIndex := 0
-	availableHeight := menuMaxHeight
 	var items []string
-	for i, cmd := range m.filteredCmds[startItemIndex:] {
-		item := m.renderMenuItem(cmd, i, menuMaxWidth)
-		itemHeight := lipgloss.Height(item)
-		if availableHeight < itemHeight {
-			break
+
+	// If cursor is visible, render from the top
+	if m.cursor < availableContentSize.Height && m.cursor <= len(m.filteredCmds)-1 {
+		// The assumption is that an item has an height of 1
+		items_num := min(availableContentSize.Height, len(m.filteredCmds))
+		for i := range items_num {
+			cmd := m.filteredCmds[i]
+			item, err := m.renderMenuItem(cmd, i, availableSize.Width)
+			if err != nil {
+				return "", err
+			}
+			items = append(items, item)
 		}
-		items = append(items, item)
-		availableHeight -= itemHeight
 	}
 
 	// If cursor is not visible, render from cursor backwards
-	if m.cursor > len(items)-1 && m.cursor <= len(m.filteredCmds)-1 {
-		lastItemIndex := m.cursor
-		availableHeight = menuMaxHeight
-		items = []string{}
-		for i := lastItemIndex; i >= 0; i-- {
+	if m.cursor >= availableContentSize.Height && m.cursor <= len(m.filteredCmds)-1 {
+		// The assumption is that an item has an height of 1
+		for i := m.cursor; i > m.cursor-availableContentSize.Height; i-- {
 			cmd := m.filteredCmds[i]
-			item := m.renderMenuItem(cmd, i, menuMaxWidth)
-			itemHeight := lipgloss.Height(item)
-			if availableHeight < itemHeight {
-				break
+			item, err := m.renderMenuItem(cmd, i, availableSize.Width)
+			if err != nil {
+				return "", err
 			}
 			items = append(items, item)
-			availableHeight -= itemHeight
 		}
 		slices.Reverse(items)
 	}
 
 	menuText := lipgloss.JoinVertical(lipgloss.Left, items...)
 
-	return m.menuStyle.Width(menuMaxWidth).Height(menuMaxHeight).Render(menuText)
+	return m.menuStyle.
+		Width(contentSize.Width).
+		Height(contentSize.Height).
+		Render(menuText), nil
 }
 
-func (m Model) renderMenuItem(item Cmd, itemIndex int, maxWidth int) string {
-	line := item.icon + " " + item.name
-	if itemIndex == m.cursor {
-		return m.selectedMenuTextStyle.Render(line)
-	}
-	return m.normalTextMenuStyle.Render(line)
-}
-
-func (m Model) renderFooter(contentWidth int) string {
-	footerWidth := getStyleMaxWidth(m.footerStyle, contentWidth)
-	footerText := "• ↑/↓ to navigate • enter to select • ctrl+c to quit"
-
-	return m.footerStyle.Width(footerWidth).Render(footerText)
-}
-
-func getTermSizeOrMinSize() (int, int) {
-	termWidth, termHeight, err := term.GetSize(os.Stdout.Fd())
+func (m Model) renderMenuItem(item Cmd, itemIndex int, availableWidth int) (string, error) {
+	availableContentWidth, err := GetStyleContentAvailableWidth(m.menuStyle, availableWidth)
 	if err != nil {
-		termWidth = minTermWidth
-		termHeight = minTermHeight
-		log.Printf(
-			"failed to get terminal size, use default size of %d, %d px",
-			termWidth,
-			termHeight,
-		)
+		return "", err
 	}
-
-	return termWidth, termHeight
+	text := item.icon + " " + item.name
+	truncText := truncate(stripNonSpaceWhitespace(text), availableContentWidth, "...")
+	if itemIndex == m.cursor {
+		return m.selectedMenuTextStyle.Render(truncText), nil
+	}
+	return m.normalTextMenuStyle.Render(truncText), nil
 }
 
-func getStyleMaxWidth(s lipgloss.Style, outerWidth int) int {
-	return outerWidth -
-		s.GetBorderLeftSize() -
-		s.GetBorderRightSize() -
+func (m Model) renderFooter(availableSize Size) (string, error) {
+	text := "• ↑/↓ to navigate • enter to select • ctrl+c to quit"
+
+	contentSize, err := GetStyleContentSize(m.footerStyle, availableSize)
+	if err != nil {
+		return "", err
+	}
+
+	return (m.footerStyle.
+		Width(contentSize.Width).
+		Render(text)), nil
+}
+
+func GetStyleContentSize(
+	s lipgloss.Style,
+	availableSize Size,
+) (Size, error) {
+	w, err := GetStyleContentWidth(s, availableSize.Width)
+	if err != nil {
+		return Size{}, err
+	}
+
+	h, err := GetStyleContentHeight(s, availableSize.Height)
+	if err != nil {
+		return Size{}, err
+	}
+
+	return Size{
+		Width:  w,
+		Height: h,
+	}, nil
+}
+
+func GetStyleContentAvailableSize(
+	s lipgloss.Style,
+	availableSize Size,
+) (Size, error) {
+	w, err := GetStyleContentAvailableWidth(s, availableSize.Width)
+	if err != nil {
+		return Size{}, err
+	}
+
+	h, err := GetStyleContentAvailableHeight(s, availableSize.Height)
+	if err != nil {
+		return Size{}, err
+	}
+
+	return Size{
+		Width:  w,
+		Height: h,
+	}, nil
+}
+
+func GetStyleContentAvailableWidth(
+	s lipgloss.Style,
+	availableWidth int,
+) (int, error) {
+	w, err := GetStyleContentWidth(s, availableWidth)
+	if err != nil {
+		return 0, err
+	}
+	aw := w -
 		s.GetPaddingLeft() -
 		s.GetPaddingRight()
+	if aw < 0 {
+		return 0, fmt.Errorf("invalid width %d", aw)
+	}
+
+	return aw, nil
 }
 
-func getStyleMaxHeight(s lipgloss.Style, outerHeight int) int {
-	return outerHeight -
-		s.GetBorderTopSize() -
-		s.GetBorderBottomSize() -
+func GetStyleContentWidth(
+	s lipgloss.Style,
+	availableWidth int,
+) (int, error) {
+	w := availableWidth -
+		s.GetMarginLeft() -
+		s.GetMarginRight() -
+		s.GetBorderLeftSize() -
+		s.GetBorderRightSize()
+	if w < 0 {
+		return 0, fmt.Errorf("invalid width %d", w)
+	}
+
+	return w, nil
+}
+
+func GetStyleContentAvailableHeight(
+	s lipgloss.Style,
+	availableHeight int,
+) (int, error) {
+	h, err := GetStyleContentHeight(s, availableHeight)
+	if err != nil {
+		return 0, err
+	}
+	ah := h -
 		s.GetPaddingTop() -
 		s.GetPaddingBottom()
+	if ah < 0 {
+		return 0, fmt.Errorf("invalid height %d", ah)
+	}
+
+	return ah, nil
+}
+
+func GetStyleContentHeight(
+	s lipgloss.Style,
+	availableHeight int,
+) (int, error) {
+	h := availableHeight -
+		s.GetMarginTop() -
+		s.GetMarginBottom() -
+		s.GetBorderTopSize() -
+		s.GetBorderBottomSize()
+	if h < 0 {
+		return 0, fmt.Errorf("invalid height %d", h)
+	}
+
+	return h, nil
 }
 
 func filterCmds(cmds []Cmd, query string) []Cmd {
@@ -212,4 +333,16 @@ func filterCmds(cmds []Cmd, query string) []Cmd {
 
 func truncate(s string, length int, tail string) string {
 	return ansi.Truncate(s, length, tail)
+}
+
+func stripNonSpaceWhitespace(s string) string {
+	return strings.Map(func(r rune) rune {
+		if r == ' ' {
+			return r
+		}
+		if r == '\n' || r == '\t' || r == '\r' || r == '\f' || r == '\v' {
+			return -1
+		}
+		return r
+	}, s)
 }

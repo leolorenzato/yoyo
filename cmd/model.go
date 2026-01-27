@@ -10,6 +10,11 @@ const (
 	defaulVertPadding  int = 0
 )
 
+type Size struct {
+	Width  int
+	Height int
+}
+
 type Model struct {
 	title                 string
 	cursor                int
@@ -17,7 +22,8 @@ type Model struct {
 	searchEnabled         bool
 	search                string
 	filteredCmds          []Cmd
-	contentBorderStyle    lipgloss.Style
+	termSize              Size
+	mainBoxStyle          lipgloss.Style
 	titleStyle            lipgloss.Style
 	searchStyle           lipgloss.Style
 	menuStyle             lipgloss.Style
@@ -33,7 +39,7 @@ type Cmd struct {
 }
 
 func NewModel(config Config) Model {
-	contentBorderStyle := lipgloss.NewStyle().
+	mainBoxStyle := lipgloss.NewStyle().
 		Border(lipgloss.RoundedBorder()).
 		BorderForeground(lipgloss.Color(config.UI.ContentBorder)).
 		Padding(defaulVertPadding, defaulHorizPadding)
@@ -82,8 +88,9 @@ func NewModel(config Config) Model {
 		cmds:                  cmds,
 		searchEnabled:         true,
 		search:                "",
+		termSize:              Size{},
 		filteredCmds:          cmds,
-		contentBorderStyle:    contentBorderStyle,
+		mainBoxStyle:          mainBoxStyle,
 		titleStyle:            titleStyle,
 		searchStyle:           searchStyle,
 		menuStyle:             menuStyle,
