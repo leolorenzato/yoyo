@@ -28,7 +28,6 @@ type Model struct {
 	searchStyle           lipgloss.Style
 	menuStyle             lipgloss.Style
 	selectedMenuTextStyle lipgloss.Style
-	normalTextMenuStyle   lipgloss.Style
 	footerStyle           lipgloss.Style
 }
 
@@ -59,14 +58,12 @@ func NewModel(config Config) Model {
 	menuStyle := lipgloss.NewStyle().
 		Border(lipgloss.RoundedBorder()).
 		BorderForeground(lipgloss.Color(config.UI.MenuBorder)).
-		Padding(defaulVertPadding, defaulHorizPadding)
+		Padding(defaulVertPadding, defaulHorizPadding).
+		Foreground(lipgloss.Color(config.UI.NormalText))
 
 	selectedMenuTextStyle := lipgloss.NewStyle().
 		Foreground(lipgloss.Color(config.UI.SelectedText)).
 		Bold(true)
-
-	normalTextMenuStyle := lipgloss.NewStyle().
-		Foreground(lipgloss.Color(config.UI.NormalText))
 
 	footerStyle := lipgloss.NewStyle().
 		Foreground(lipgloss.Color(config.UI.Footer)).
@@ -95,7 +92,6 @@ func NewModel(config Config) Model {
 		searchStyle:           searchStyle,
 		menuStyle:             menuStyle,
 		selectedMenuTextStyle: selectedMenuTextStyle,
-		normalTextMenuStyle:   normalTextMenuStyle,
 		footerStyle:           footerStyle,
 	}
 }
