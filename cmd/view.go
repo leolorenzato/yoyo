@@ -192,7 +192,7 @@ func (m Model) renderMenuItem(item Cmd, itemIndex int, availableWidth int) (stri
 	if itemIndex == m.cursor {
 		return m.selectedMenuTextStyle.Render(truncText), nil
 	}
-	return m.normalTextMenuStyle.Render(truncText), nil
+	return truncText, nil
 }
 
 func (m Model) renderFooter(availableSize Size) (string, error) {
