@@ -45,6 +45,7 @@ func (m Model) Init() tea.Cmd {
 
 func (m *Model) filterItems(query string) {
 	m.filteredItems = filterItems(m.items, query)
+	m.clipCursor()
 }
 
 func (m *Model) incrementCursor() {
