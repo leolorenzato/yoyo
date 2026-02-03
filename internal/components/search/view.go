@@ -1,0 +1,31 @@
+package search
+
+import (
+	"yoyo/internal/layout"
+)
+
+func (m Model) View() string {
+	rendered, err := m.render()
+	if err != nil {
+		return ""
+	}
+
+	return rendered
+}
+
+func (m Model) render() (string, error) {
+	text := m.Icon + " " + m.SearchText
+	contentSize, err := layout.GetStyleContentSize(m.Style, m.AvailableSize)
+	if err != nil {
+		return "", err
+	}
+	availableContentSize, err := layout.GetStyleContentAvailableSize(m.Style, m.AvailableSize)
+	if err != nil {
+		return "", err
+	}
+	truncText := layout.Truncate(layout.StripNonSpaceWhitespace(text), availableContentSize.Width, "...")
+
+	return (m.Style.
+		Width(contentSize.Width).
+		Render(truncText)), nil
+}
