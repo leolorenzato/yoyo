@@ -7,7 +7,7 @@ import (
 	"github.com/charmbracelet/lipgloss"
 )
 
-const defaultText string = "• ↑/↓ to navigate • enter to select • ctrl+c to quit"
+const defaultText string = "• ↑/↓ to navigate • ↵ to select • ctrl+c to quit"
 
 type Model struct {
 	text          string
