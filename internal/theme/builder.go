@@ -139,9 +139,7 @@ func buildMenuStyle(cfg MenuCfg) MenuStyles {
 		Foreground(lipgloss.Color(cfg.TextColor))
 
 	selectedItemsStyle := lipgloss.NewStyle().
-		Foreground(lipgloss.Color(cfg.SelectedItemTextColor)).
-		Bold(true)
-
+		Foreground(lipgloss.Color(cfg.SelectedItemTextColor))
 	return MenuStyles{
 		Container:    containerStyle,
 		Item:         itemStyle,
