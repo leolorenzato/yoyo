@@ -9,15 +9,20 @@ type Cfg struct {
 }
 
 type ContainerCfg struct {
+	Border        bool   `toml:"border"`
 	BorderColor   string `toml:"borderColor"`
 	BorderRounded bool   `toml:"borderRounded"`
 }
 
 type TitleCfg struct {
-	TextColor string `toml:"textColor"`
+	Border        bool   `toml:"border"`
+	BorderColor   string `toml:"borderColor"`
+	BorderRounded bool   `toml:"borderRounded"`
+	TextColor     string `toml:"textColor"`
 }
 
 type SearchCfg struct {
+	Border        bool   `toml:"border"`
 	BorderColor   string `toml:"borderColor"`
 	BorderRounded bool   `toml:"borderRounded"`
 	TextColor     string `toml:"textColor"`
@@ -25,6 +30,7 @@ type SearchCfg struct {
 }
 
 type MenuCfg struct {
+	Border                bool   `toml:"border"`
 	BorderColor           string `toml:"borderColor"`
 	BorderRounded         bool   `toml:"borderRounded"`
 	TextColor             string `toml:"textColor"`
@@ -32,5 +38,8 @@ type MenuCfg struct {
 }
 
 type FooterCfg struct {
-	TextColor string `toml:"textColor"`
+	Border        bool   `toml:"border"`
+	BorderColor   string `toml:"borderColor"`
+	BorderRounded bool   `toml:"borderRounded"`
+	TextColor     string `toml:"textColor"`
 }

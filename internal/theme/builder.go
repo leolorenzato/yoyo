@@ -19,16 +19,31 @@ func Build(cfg Cfg) Styles {
 }
 
 func buildContainerStyle(cfg ContainerCfg) lipgloss.Style {
-	var border lipgloss.Border
-	if cfg.BorderRounded {
-		border = lipgloss.RoundedBorder()
-	} else {
-		border = lipgloss.NormalBorder()
-	}
 	style := lipgloss.NewStyle().
-		Border(border).
-		BorderForeground(lipgloss.Color(cfg.BorderColor)).
 		Padding(defaulVertPadding, defaulHorizPadding)
+
+	if cfg.Border {
+		var border lipgloss.Border
+		if cfg.BorderRounded {
+			border = lipgloss.RoundedBorder()
+		} else {
+			border = lipgloss.NormalBorder()
+		}
+		borderColor := lipgloss.Color(cfg.BorderColor)
+		style = style.
+			Border(border).
+			BorderForeground(borderColor)
+	} else {
+		var border lipgloss.Border
+		border = lipgloss.Border{
+			Top: " ", Bottom: " ",
+			Left: " ", Right: " ",
+			TopLeft: " ", TopRight: " ",
+			BottomLeft: " ", BottomRight: " ",
+		}
+		style = style.
+			Border(border)
+	}
 
 	return style
 }
@@ -38,37 +53,87 @@ func buildTitleStyle(cfg TitleCfg) lipgloss.Style {
 		Foreground(lipgloss.Color(cfg.TextColor)).
 		Align(lipgloss.Center).
 		Bold(true)
+	if cfg.Border {
+		var border lipgloss.Border
+		if cfg.BorderRounded {
+			border = lipgloss.RoundedBorder()
+		} else {
+			border = lipgloss.NormalBorder()
+		}
+		borderColor := lipgloss.Color(cfg.BorderColor)
+		style = style.
+			Border(border).
+			BorderForeground(borderColor)
+	} else {
+		var border lipgloss.Border
+		border = lipgloss.Border{
+			Top: " ", Bottom: " ",
+			Left: " ", Right: " ",
+			TopLeft: " ", TopRight: " ",
+			BottomLeft: " ", BottomRight: " ",
+		}
+		style = style.
+			Border(border)
+	}
 
 	return style
 }
 
 func buildSearchStyle(cfg SearchCfg) lipgloss.Style {
-	var border lipgloss.Border
-	if cfg.BorderRounded {
-		border = lipgloss.RoundedBorder()
-	} else {
-		border = lipgloss.NormalBorder()
-	}
 	style := lipgloss.NewStyle().
-		Border(border).
-		BorderForeground(lipgloss.Color(cfg.BorderColor)).
 		Foreground(lipgloss.Color(cfg.TextColor)).
 		Padding(defaulVertPadding, defaulHorizPadding)
+	if cfg.Border {
+		var border lipgloss.Border
+		if cfg.BorderRounded {
+			border = lipgloss.RoundedBorder()
+		} else {
+			border = lipgloss.NormalBorder()
+		}
+		borderColor := lipgloss.Color(cfg.BorderColor)
+		style = style.
+			Border(border).
+			BorderForeground(borderColor)
+	} else {
+		var border lipgloss.Border
+		border = lipgloss.Border{
+			Top: " ", Bottom: " ",
+			Left: " ", Right: " ",
+			TopLeft: " ", TopRight: " ",
+			BottomLeft: " ", BottomRight: " ",
+		}
+		style = style.
+			Border(border)
+	}
 
 	return style
 }
 
 func buildMenuStyle(cfg MenuCfg) MenuStyles {
-	var border lipgloss.Border
-	if cfg.BorderRounded {
-		border = lipgloss.RoundedBorder()
-	} else {
-		border = lipgloss.NormalBorder()
-	}
 	containerStyle := lipgloss.NewStyle().
-		Border(border).
-		BorderForeground(lipgloss.Color(cfg.BorderColor)).
 		Padding(defaulVertPadding, defaulHorizPadding)
+	if cfg.Border {
+		var border lipgloss.Border
+		if cfg.BorderRounded {
+			border = lipgloss.RoundedBorder()
+		} else {
+			border = lipgloss.NormalBorder()
+		}
+		borderColor := lipgloss.Color(cfg.BorderColor)
+		containerStyle = containerStyle.
+			Border(border).
+			BorderForeground(borderColor)
+	} else {
+		var border lipgloss.Border
+		border = lipgloss.Border{
+			Top: " ", Bottom: " ",
+			Left: " ", Right: " ",
+			TopLeft: " ", TopRight: " ",
+			BottomLeft: " ", BottomRight: " ",
+		}
+		containerStyle = containerStyle.
+			Border(border)
+	}
 
 	itemStyle := lipgloss.NewStyle().
 		Foreground(lipgloss.Color(cfg.TextColor))
@@ -89,6 +154,28 @@ func buildFooterStyle(cfg FooterCfg) lipgloss.Style {
 		Foreground(lipgloss.Color(cfg.TextColor)).
 		Align(lipgloss.Center).
 		Padding(defaulVertPadding, defaulHorizPadding)
+	if cfg.Border {
+		var border lipgloss.Border
+		if cfg.BorderRounded {
+			border = lipgloss.RoundedBorder()
+		} else {
+			border = lipgloss.NormalBorder()
+		}
+		borderColor := lipgloss.Color(cfg.BorderColor)
+		style = style.
+			Border(border).
+			BorderForeground(borderColor)
+	} else {
+		var border lipgloss.Border
+		border = lipgloss.Border{
+			Top: " ", Bottom: " ",
+			Left: " ", Right: " ",
+			TopLeft: " ", TopRight: " ",
+			BottomLeft: " ", BottomRight: " ",
+		}
+		style = style.
+			Border(border)
+	}
 
 	return style
 }
