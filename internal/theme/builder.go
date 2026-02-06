@@ -33,16 +33,6 @@ func buildContainerStyle(cfg ContainerCfg) lipgloss.Style {
 		style = style.
 			Border(border).
 			BorderForeground(borderColor)
-	} else {
-		var border lipgloss.Border
-		border = lipgloss.Border{
-			Top: " ", Bottom: " ",
-			Left: " ", Right: " ",
-			TopLeft: " ", TopRight: " ",
-			BottomLeft: " ", BottomRight: " ",
-		}
-		style = style.
-			Border(border)
 	}
 
 	return style
