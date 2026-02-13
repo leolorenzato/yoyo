@@ -1,6 +1,13 @@
 # yoyo 🪀
 
-### Configuration
+**yoyo** is a lightweight **TUI command launcher** written in Go with [Bubble Tea](https://github.com/charmbracelet/bubbletea).
+
+### Features
+- Configurable launch list
+- Search items in the list
+- Theme customization
+
+### Command Configuration
 
 ```toml
 [app]
@@ -21,7 +28,11 @@ cmd = """$TERMINAL -e $SHELL -c 'echo "Ciao yoyo!🪀🚀"; exec $SHELL'"""
 name = "hola"
 icon = "🇪🇸"
 cmd = """$TERMINAL -e $SHELL -c 'echo "Hola yoyo!🪀🚀"; exec $SHELL'"""
+```
 
+### Theme Configuration
+
+```toml
 [theme.container]
 border = false
 borderColor = "#6C6F85"
