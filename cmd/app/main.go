@@ -6,9 +6,7 @@ import (
 	"io"
 	"log"
 	"os"
-	"path/filepath"
 	"yoyo/internal/app"
-	"yoyo/internal/components/menu"
 	"yoyo/internal/theme"
 
 	"github.com/BurntSushi/toml"
@@ -23,16 +21,7 @@ func main() {
 	flag.Parse()
 
 	if *debug {
-		logDir := filepath.Join(os.Getenv("HOME"), ".config", appName, "log")
-		os.MkdirAll(logDir, os.ModePerm)
-		logFile := filepath.Join(logDir, "debug.log")
-		err := os.Truncate(logFile, 0)
-		if err != nil && !os.IsNotExist(err) {
-			fmt.Println("failed to truncate log file:", err)
-			os.Exit(1)
-		}
-
-		f, err := tea.LogToFile(logFile, "")
+		f, err := getLogFile()
 		if err != nil {
 			fmt.Println("failed to setup the logger:", err)
 			os.Exit(1)
@@ -60,20 +49,7 @@ func main() {
 		tea.WithAltScreen(),
 	)
 	if _, err := p.Run(); err != nil {
-		log.Printf("Error: %v", err)
+		log.Printf("error: %v", err)
 		os.Exit(1)
 	}
-}
-
-func getItemsFromCfg(cfg []ItemCfg) []menu.Item {
-	var items []menu.Item
-	for _, item := range cfg {
-		items = append(items, menu.Item{
-			Name: item.Name,
-			Icon: item.Icon,
-			Cmd:  item.Cmd,
-		})
-	}
-
-	return items
 }

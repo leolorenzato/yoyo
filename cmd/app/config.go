@@ -1,6 +1,8 @@
 package main
 
-import "yoyo/internal/theme"
+import (
+	"yoyo/internal/theme"
+)
 
 type AppCfg struct {
 	Title        string `toml:"title"`
