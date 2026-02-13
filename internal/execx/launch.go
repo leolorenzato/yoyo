@@ -13,7 +13,7 @@ func Launch(cmdText string) error {
 		return fmt.Errorf("shell not found")
 	}
 
-	cmd := exec.Command(shell, "-lc", cmdText)
+	cmd := exec.Command(shell, "-c", cmdText)
 	cmd.SysProcAttr = &syscall.SysProcAttr{
 		Setsid: true,
 	}

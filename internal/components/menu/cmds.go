@@ -10,7 +10,9 @@ import (
 func LaunchCmd(cmdText string) tea.Cmd {
 	return func() tea.Msg {
 		err := execx.Launch(cmdText)
-		log.Printf("command launch error: %v", err)
+		if err != nil {
+			log.Printf("command launch error: %v", err)
+		}
 
 		return tea.Quit()
 	}
