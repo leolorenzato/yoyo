@@ -6,6 +6,7 @@ import (
 	"io"
 	"log"
 	"os"
+	"path/filepath"
 	"yoyo/internal/app"
 	"yoyo/internal/components/menu"
 	"yoyo/internal/theme"
@@ -22,8 +23,13 @@ func main() {
 	flag.Parse()
 
 	if *debug {
-		logFilePath := "./log/debug.log"
-		err := os.Truncate(logFilePath, 0)
+		cwd, err := os.Getwd()
+		if err != nil {
+			fmt.Println("Error:", err)
+			os.Exit(1)
+		}
+		logFilePath := filepath.Join(cwd, "log", "debug.log")
+		err = os.Truncate(logFilePath, 0)
 		if err != nil && !os.IsNotExist(err) {
 			fmt.Println("failed to truncate log file:", err)
 			os.Exit(1)
