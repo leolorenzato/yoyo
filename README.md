@@ -1,0 +1,54 @@
+# yoyo 🪀
+
+### Configuration
+
+```toml
+[app]
+title = "Greetings 👋"
+enableSearch = true
+
+[[items]]
+name = "hello"
+icon = "🇬🇧"
+cmd = """$TERMINAL -e $SHELL -c 'echo "Hello yoyo!🪀🚀"; exec $SHELL'"""
+
+[[items]]
+name = "ciao"
+icon = "🇮🇹"
+cmd = """$TERMINAL -e $SHELL -c 'echo "Ciao yoyo!🪀🚀"; exec $SHELL'"""
+
+[[items]]
+name = "hola"
+icon = "🇪🇸"
+cmd = """$TERMINAL -e $SHELL -c 'echo "Hola yoyo!🪀🚀"; exec $SHELL'"""
+
+[theme.container]
+border = false
+borderColor = "#6C6F85"
+borderRounded = true
+
+[theme.title]
+border = false
+borderColor = "#6C6F85"
+borderRounded = true
+textColor = "#DDB6F2"
+
+[theme.search]
+border = true
+borderColor = "#6C6F85"
+borderRounded = true
+textColor = "#E0E0E0"
+
+[theme.menu]
+border = true
+borderColor = "#6C6F85"
+borderRounded = true
+textColor = "#E0E0E0"
+selectedItemTextColor = "#A6E3A1"
+
+[theme.footer]
+border = false
+borderColor = "#6C6F85"
+borderRounded = true
+textColor = "#8F90A0"
+```
