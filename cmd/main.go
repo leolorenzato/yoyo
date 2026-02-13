@@ -23,19 +23,16 @@ func main() {
 	flag.Parse()
 
 	if *debug {
-		cwd, err := os.Getwd()
-		if err != nil {
-			fmt.Println("Error:", err)
-			os.Exit(1)
-		}
-		logFilePath := filepath.Join(cwd, "log", "debug.log")
-		err = os.Truncate(logFilePath, 0)
+		logDir := filepath.Join(os.Getenv("HOME"), ".config", appName, "log")
+		os.MkdirAll(logDir, os.ModePerm)
+		logFile := filepath.Join(logDir, "debug.log")
+		err := os.Truncate(logFile, 0)
 		if err != nil && !os.IsNotExist(err) {
 			fmt.Println("failed to truncate log file:", err)
 			os.Exit(1)
 		}
 
-		f, err := tea.LogToFile(logFilePath, "")
+		f, err := tea.LogToFile(logFile, "")
 		if err != nil {
 			fmt.Println("failed to setup the logger:", err)
 			os.Exit(1)
