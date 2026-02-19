@@ -2,10 +2,27 @@
 
 **yoyo** is a lightweight **TUI command launcher** written in Go with [Bubble Tea](https://github.com/charmbracelet/bubbletea).
 
+<img src="img/example_0_medium.png" width="1200">
+
 ### Features
 - Configurable launch list
 - Search items in the list
 - Theme customization
+
+### Build
+
+```bash
+git clone git@github.com:leolorenzato/yoyo.git
+cd ./yoyo
+go build -o ./bin/yoyo ./cmd/app
+```
+
+### Run
+- create a config file (e.g `~/.config/yoyo/config.toml`)
+- run the app
+    ```bash
+    ./bin/yoyo -c path/to/config.toml
+    ```
 
 ### Command Configuration
 
