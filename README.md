@@ -4,12 +4,13 @@
 
 <img src="img/example_0_medium.png" width="1200">
 
-### Features
-- Configurable launch list
-- Search items in the list
-- Theme customization
+### ✨ Features
+- ⚙️ Configurable launch list
+- 🔎 Search items in the list
+- 🎨 Theme customization
+- 🚀 Fast & lightweight
 
-### Build
+### 🔧 Build
 
 ```bash
 git clone git@github.com:leolorenzato/yoyo.git
@@ -17,14 +18,14 @@ cd ./yoyo
 go build -o ./bin/yoyo ./cmd/app
 ```
 
-### Run
+### 🚀 Run
 - create a config file (e.g `~/.config/yoyo/config.toml`)
 - run the app
     ```bash
     ./bin/yoyo -c path/to/config.toml
     ```
 
-### Command Configuration
+### 🧩 Command Configuration
 
 ```toml
 [app]
@@ -47,7 +48,7 @@ icon = "🇪🇸"
 cmd = """$TERMINAL -e $SHELL -c 'echo "Hola yoyo!🪀🚀"; exec $SHELL'"""
 ```
 
-### Theme Configuration
+### 🎨 Theme Configuration
 
 ```toml
 [theme.container]
@@ -81,5 +82,5 @@ borderRounded = true
 textColor = "#8F90A0"
 ```
 
-## License
+## 📄 License
 Distributed under [MIT](https://github.com/leolorenzato/yoyo/blob/main/LICENSE)
