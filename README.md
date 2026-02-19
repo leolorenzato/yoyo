@@ -63,3 +63,6 @@ borderColor = "#6C6F85"
 borderRounded = true
 textColor = "#8F90A0"
 ```
+
+## License
+Distributed under [MIT](https://github.com/leolorenzato/yoyo/blob/main/LICENSE)
