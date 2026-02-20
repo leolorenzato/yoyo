@@ -27,7 +27,7 @@ func main() {
 		os.Exit(0)
 	}
 
-	requireFlag(cfgPath, "c")
+	requireStringFlag(cfgPath, "c")
 
 	if *debug {
 		f, err := getLogFile()
@@ -63,9 +63,9 @@ func main() {
 	}
 }
 
-func requireFlag(value *string, name string) {
+func requireStringFlag(value *string, name string) {
 	if *value == "" {
-		fmt.Printf("%s is required\n", name)
+		fmt.Fprintf(os.Stderr, "%s is required\n", name)
 		os.Exit(1)
 	}
 }
