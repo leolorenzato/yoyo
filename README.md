@@ -1,5 +1,10 @@
 # yoyo 🪀
 
+![GitHub License](https://img.shields.io/github/license/leolorenzato/yoyo)
+[![Go Report Card](https://goreportcard.com/badge/github.com/leolorenzato/yoyo)](https://goreportcard.com/report/github.com/leolorenzato/yoyo)
+![GitHub Release](https://img.shields.io/github/v/release/leolorenzato/yoyo)
+![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/leolorenzato/yoyo)
+
 **yoyo** is a lightweight **TUI command launcher** written in Go with [Bubble Tea](https://github.com/charmbracelet/bubbletea).
 
 <img src="img/example_0_medium.png" width="1200">
@@ -10,13 +15,18 @@
 - 🎨 Theme customization
 - 🚀 Fast & lightweight
 
-### 🔧 Build
+### 🔧 Build from Source
+- check Go version (requires **Go 1.24+**)
+    ```bash
+    go version
+    ```
 
-```bash
-git clone git@github.com:leolorenzato/yoyo.git
-cd ./yoyo
-go build -o ./bin/yoyo ./cmd/app
-```
+- build the app
+    ```bash
+    git clone git@github.com:leolorenzato/yoyo.git
+    cd ./yoyo
+    go build -o ./bin/yoyo ./cmd/app
+    ```
 
 ### 🚀 Run
 - create a config file (e.g `~/.config/yoyo/config.toml`)
