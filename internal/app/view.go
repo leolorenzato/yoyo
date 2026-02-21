@@ -1,7 +1,7 @@
 package app
 
 import (
-	"fmt"
+	"log"
 	"yoyo/internal/components/types"
 	"yoyo/internal/layout"
 
@@ -10,19 +10,27 @@ import (
 
 func (m Model) View() string {
 	containerAvailableSize := m.termSize
-	containerContentSize, err := layout.GetStyleContentSize(m.containerStyle, containerAvailableSize)
+	containerContentSize, err := layout.GetStyleContentSize(
+		m.containerStyle,
+		containerAvailableSize,
+	)
 	if err != nil {
-		return fmt.Sprintf("terminal size too small: %v", err)
+		log.Printf("get container content size error: %v", err)
+		return m.viewErr("terminal size too small", containerAvailableSize)
 	}
-	containerContentAvailableSize, err := layout.GetStyleContentAvailableSize(m.containerStyle, containerAvailableSize)
+	containerContentAvailableSize, err := layout.GetStyleContentAvailableSize(
+		m.containerStyle,
+		containerAvailableSize,
+	)
 	if err != nil {
-		return fmt.Sprintf("terminal size too small: %v", err)
+		log.Printf("get container content available size error: %v", err)
+		return m.viewErr("terminal size too small", containerAvailableSize)
 	}
 
 	m.title.AvailableSize = containerContentAvailableSize
 	renderedTitle := m.title.View()
 	if renderedTitle == "" {
-		return "title rendering error"
+		return m.viewErr("title rendering error", containerAvailableSize)
 	}
 
 	var renderedSearch string
@@ -30,7 +38,7 @@ func (m Model) View() string {
 	m.footer.AvailableSize = containerContentAvailableSize
 	renderedFooter := m.footer.View()
 	if renderedFooter == "" {
-		return "footer rendering error"
+		return m.viewErr("footer rendering error", containerAvailableSize)
 	}
 
 	var containerContentFreeHeight int
@@ -38,7 +46,7 @@ func (m Model) View() string {
 		m.search.AvailableSize = containerContentAvailableSize
 		renderedSearch = m.search.View()
 		if renderedSearch == "" {
-			return "search rendering error"
+			return m.viewErr("search rendering error", containerAvailableSize)
 		}
 
 		containerContentFreeHeight = containerContentAvailableSize.Height -
@@ -58,7 +66,7 @@ func (m Model) View() string {
 	m.menu.AvailableSize = containerContentFreeSize
 	renderedMenu := m.menu.View()
 	if renderedMenu == "" {
-		return "menu rendering error"
+		return m.viewErr("menu rendering error", containerAvailableSize)
 	}
 
 	var joinedContent string
@@ -90,5 +98,19 @@ func (m Model) View() string {
 		lipgloss.Center,
 		lipgloss.Center,
 		renderedContainer,
+	)
+}
+
+func (m Model) viewErr(err string, size types.Size) string {
+	renderedErr := m.errorStyle.
+		Width(size.Width).
+		Render(err)
+
+	return lipgloss.Place(
+		size.Width,
+		size.Height,
+		lipgloss.Center,
+		lipgloss.Center,
+		renderedErr,
 	)
 }

@@ -9,6 +9,7 @@ type MenuStyles struct {
 }
 
 type Styles struct {
+	Error     lipgloss.Style
 	Container lipgloss.Style
 	Title     lipgloss.Style
 	Search    lipgloss.Style

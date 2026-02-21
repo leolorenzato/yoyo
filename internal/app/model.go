@@ -15,6 +15,7 @@ import (
 type Model struct {
 	appName        string
 	termSize       types.Size
+	errorStyle     lipgloss.Style
 	containerStyle lipgloss.Style
 	title          title.Model
 	search         *search.Model
@@ -31,6 +32,7 @@ func NewModel(
 ) Model {
 	m := Model{
 		appName:        appName,
+		errorStyle:     styles.Error,
 		containerStyle: styles.Container,
 		title:          title.NewModel(titletext, styles.Title),
 		menu: menu.NewModel(

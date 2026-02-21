@@ -10,12 +10,18 @@ const (
 func Build(cfg Cfg) Styles {
 
 	return Styles{
+		Error:     buildErrorStyle(),
 		Container: buildContainerStyle(cfg.Container),
 		Title:     buildTitleStyle(cfg.Title),
 		Search:    buildSearchStyle(cfg.Search),
 		Menu:      buildMenuStyle(cfg.Menu),
 		Footer:    buildFooterStyle(cfg.Footer),
 	}
+}
+
+func buildErrorStyle() lipgloss.Style {
+	return lipgloss.NewStyle().
+		Foreground(lipgloss.Color("#f38ba8"))
 }
 
 func buildContainerStyle(cfg ContainerCfg) lipgloss.Style {
