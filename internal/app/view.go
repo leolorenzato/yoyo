@@ -22,7 +22,7 @@ func (m Model) View() string {
 	m.title.AvailableSize = containerContentAvailableSize
 	renderedTitle := m.title.View()
 	if renderedTitle == "" {
-		return fmt.Sprintln("title rendering error")
+		return "title rendering error"
 	}
 
 	var renderedSearch string
@@ -30,7 +30,7 @@ func (m Model) View() string {
 	m.footer.AvailableSize = containerContentAvailableSize
 	renderedFooter := m.footer.View()
 	if renderedFooter == "" {
-		return fmt.Sprintln("footer rendering error")
+		return "footer rendering error"
 	}
 
 	var containerContentFreeHeight int
@@ -38,7 +38,7 @@ func (m Model) View() string {
 		m.search.AvailableSize = containerContentAvailableSize
 		renderedSearch = m.search.View()
 		if renderedSearch == "" {
-			return fmt.Sprintln("search rendering error")
+			return "search rendering error"
 		}
 
 		containerContentFreeHeight = containerContentAvailableSize.Height -
@@ -58,7 +58,7 @@ func (m Model) View() string {
 	m.menu.AvailableSize = containerContentFreeSize
 	renderedMenu := m.menu.View()
 	if renderedMenu == "" {
-		return fmt.Sprintln("menu rendering error")
+		return "menu rendering error"
 	}
 
 	var joinedContent string
