@@ -1,12 +1,14 @@
 package footer
 
 import (
+	"log"
 	"yoyo/internal/layout"
 )
 
 func (m Model) View() string {
 	rendered, err := m.render()
 	if err != nil {
+		log.Printf("footer render error: %v", err)
 		return ""
 	}
 

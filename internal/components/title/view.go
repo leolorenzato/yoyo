@@ -1,12 +1,14 @@
 package title
 
 import (
+	"log"
 	"yoyo/internal/layout"
 )
 
 func (m Model) View() string {
 	rendered, err := m.render()
 	if err != nil {
+		log.Printf("title render error: %v", err)
 		return ""
 	}
 

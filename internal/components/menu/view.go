@@ -1,6 +1,7 @@
 package menu
 
 import (
+	"log"
 	"slices"
 	"yoyo/internal/layout"
 
@@ -10,6 +11,7 @@ import (
 func (m Model) View() string {
 	rendered, err := m.render()
 	if err != nil {
+		log.Printf("menu render error: %v", err)
 		return ""
 	}
 
