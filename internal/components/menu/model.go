@@ -49,27 +49,23 @@ func (m *Model) filterItems(query string) {
 }
 
 func (m *Model) incrementCursor() {
-	if m.cursor < len(m.filteredItems)-1 {
-		m.cursor++
-	}
+	m.cursor++
 	m.clipCursor()
 }
 
 func (m *Model) decrementCursor() {
-	if m.cursor > 0 {
-		m.cursor--
-	}
+	m.cursor--
 	m.clipCursor()
 }
 
 func (m *Model) clipCursor() {
-	if m.cursor >= len(m.filteredItems) {
-		if len(m.filteredItems) == 0 {
-			m.cursor = 0
-		} else {
-			m.cursor = len(m.filteredItems) - 1
-		}
+	n := len(m.filteredItems)
+	if n == 0 {
+		m.cursor = 0
+		return
 	}
+
+	m.cursor = (m.cursor%n + n) % n
 }
 
 func (m *Model) getSelectedItem() Item {
