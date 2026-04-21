@@ -5,7 +5,7 @@
 ![GitHub Release](https://img.shields.io/github/v/release/leolorenzato/yoyo)
 ![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/leolorenzato/yoyo)
 
-**yoyo** is a lightweight **TUI command launcher** written in Go with [Bubble Tea](https://github.com/charmbracelet/bubbletea).
+**yoyo** is a **TUI command launcher** written in Go with [Bubble Tea](https://github.com/charmbracelet/bubbletea).
 
 <img src="img/yoyo_demo.gif" width="1200">
 
@@ -13,7 +13,6 @@
 - ⚙️ Configurable launch list
 - 🔎 Search items in the list
 - 🎨 Theme customization
-- 🚀 Fast & lightweight
 
 ### 🔧 Build from Source
 - check Go version (requires **Go 1.24+**)
@@ -90,6 +89,20 @@ border = false
 borderColor = "#6C6F85"
 borderRounded = true
 textColor = "#8F90A0"
+```
+
+## Hyprland
+
+### Run
+Launch the app (e.g., via a Hyprland keybind).  
+❗️ The example below uses a terminal emulator that supports window classes.
+```text
+$TERMINAL --class yoyo-apps -e yoyo -c ~/.config/yoyo/apps.toml
+```
+
+To center the window and set a fixed size:
+```text
+windowrule = match:class ^(yoyo-apps)$, float on, center on, size 600 400
 ```
 
 ## 📄 License
