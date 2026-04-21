@@ -7,7 +7,7 @@
 
 **yoyo** is a **TUI command launcher** written in Go with [Bubble Tea](https://github.com/charmbracelet/bubbletea).
 
-<img src="img/yoyo_demo.gif" width="1200">
+<img src="img/yoyo.gif" width="1200">
 
 ### ✨ Features
 - ⚙️ Configurable launch list
