@@ -1,11 +1,12 @@
 package menu
 
 import (
+	"fmt"
 	"strings"
 	"yoyo/internal/components/types"
 
-	tea "github.com/charmbracelet/bubbletea"
-	"github.com/charmbracelet/lipgloss"
+	tea "charm.land/bubbletea/v2"
+	"charm.land/lipgloss/v2"
 )
 
 type Item struct {
@@ -22,6 +23,7 @@ type Model struct {
 	ContainerStyle    lipgloss.Style
 	ItemStyle         lipgloss.Style
 	SelectedItemStyle lipgloss.Style
+	dryRun            bool
 }
 
 func NewModel(
@@ -29,6 +31,7 @@ func NewModel(
 	containerStyle lipgloss.Style,
 	itemStyle lipgloss.Style,
 	selectedItemStyle lipgloss.Style,
+	dryRun bool,
 ) Model {
 	return Model{
 		items:             items,
@@ -36,11 +39,24 @@ func NewModel(
 		ContainerStyle:    containerStyle,
 		ItemStyle:         itemStyle,
 		SelectedItemStyle: selectedItemStyle,
+		dryRun:            dryRun,
 	}
 }
 
 func (m Model) Init() tea.Cmd {
 	return nil
+}
+
+func (m Model) getAvailableSize() (types.Size, error) {
+	if m.AvailableSize.Width <= 0 || m.AvailableSize.Height <= 0 {
+		return types.Size{}, fmt.Errorf(
+			"invalid available size, width: %d height %d",
+			m.AvailableSize.Width,
+			m.AvailableSize.Height,
+		)
+	}
+
+	return m.AvailableSize, nil
 }
 
 func (m *Model) filterItems(query string) {

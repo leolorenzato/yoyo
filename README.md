@@ -5,7 +5,7 @@
 ![GitHub Release](https://img.shields.io/github/v/release/leolorenzato/yoyo)
 ![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/leolorenzato/yoyo)
 
-**yoyo** is a **TUI command launcher** written in Go with [Bubble Tea](https://github.com/charmbracelet/bubbletea).
+**yoyo** is a **TUI command launcher** written in Go with [Bubble Tea](https://charm.land/bubbletea/v2).
 
 <img src="img/yoyo.gif" width="1200">
 

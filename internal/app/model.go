@@ -1,6 +1,7 @@
 package app
 
 import (
+	"fmt"
 	"yoyo/internal/components/footer"
 	"yoyo/internal/components/menu"
 	"yoyo/internal/components/search"
@@ -8,8 +9,8 @@ import (
 	"yoyo/internal/components/types"
 	"yoyo/internal/theme"
 
-	tea "github.com/charmbracelet/bubbletea"
-	"github.com/charmbracelet/lipgloss"
+	tea "charm.land/bubbletea/v2"
+	"charm.land/lipgloss/v2"
 )
 
 type Model struct {
@@ -29,6 +30,7 @@ func NewModel(
 	styles theme.Styles,
 	titletext string,
 	enableSearch bool,
+	dryRun bool,
 ) Model {
 	m := Model{
 		appName:        appName,
@@ -40,6 +42,7 @@ func NewModel(
 			styles.Menu.Container,
 			styles.Menu.Item,
 			styles.Menu.SelectedItem,
+			dryRun,
 		),
 		footer: footer.NewModel(styles.Footer),
 	}
@@ -54,8 +57,6 @@ func NewModel(
 
 func (m Model) Init() tea.Cmd {
 	var cmds []tea.Cmd
-
-	cmds = append(cmds, tea.SetWindowTitle(m.appName))
 
 	if cmd := m.title.Init(); cmd != nil {
 		cmds = append(cmds, cmd)
@@ -76,4 +77,16 @@ func (m Model) Init() tea.Cmd {
 	}
 
 	return tea.Batch(cmds...)
+}
+
+func (m Model) getAvailableSize() (types.Size, error) {
+	if m.termSize.Width <= 0 || m.termSize.Height <= 0 {
+		return types.Size{}, fmt.Errorf(
+			"invalid available size, width: %d height %d",
+			m.termSize.Width,
+			m.termSize.Height,
+		)
+	}
+
+	return m.termSize, nil
 }

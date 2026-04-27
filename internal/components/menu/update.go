@@ -1,26 +1,30 @@
 package menu
 
 import (
+	"log"
 	"yoyo/internal/components/search"
+	"yoyo/internal/components/types"
 
-	tea "github.com/charmbracelet/bubbletea"
+	tea "charm.land/bubbletea/v2"
 )
 
-func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m Model) Update(msg tea.Msg) (types.InternalModel, tea.Cmd) {
 	switch msg := msg.(type) {
 	case search.SearchChangeMsg:
 		m.filterItems(msg.Query)
 		return m, nil
-	case tea.KeyMsg:
-		switch msg.Type {
-		case tea.KeyCtrlC:
-			return m, tea.Quit
-		case tea.KeyUp:
+	case tea.KeyPressMsg:
+		switch msg.String() {
+		case "up":
 			m.decrementCursor()
-		case tea.KeyDown:
+		case "down":
 			m.incrementCursor()
-		case tea.KeyEnter:
+		case "enter":
 			item := m.getSelectedItem()
+			if m.dryRun {
+				log.Printf("dry run: command to launch: %s", item.Cmd)
+				return m, nil
+			}
 			return m, LaunchCmd(item.Cmd)
 		}
 	}

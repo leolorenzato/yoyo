@@ -1,52 +1,92 @@
 package app
 
 import (
+	"fmt"
 	"log"
 	"yoyo/internal/components/types"
 	"yoyo/internal/layout"
+	"yoyo/internal/utils"
 
-	"github.com/charmbracelet/lipgloss"
+	tea "charm.land/bubbletea/v2"
+	"charm.land/lipgloss/v2"
 )
 
-func (m Model) View() string {
-	containerAvailableSize := m.termSize
+func (m Model) View() tea.View {
+	v := tea.NewView(m.view())
+	v.AltScreen = true
+	v.WindowTitle = m.appName
+
+	return v
+}
+
+func (m Model) view() string {
+	containerAvailableSize, err := m.getAvailableSize()
+	if err != nil {
+		log.Printf("failed to get available size: %v", err)
+		return m.viewErr(fmt.Errorf("invalid available size"), containerAvailableSize)
+	}
+
 	containerContentSize, err := layout.GetStyleContentSize(
 		m.containerStyle,
 		containerAvailableSize,
 	)
 	if err != nil {
 		log.Printf("get container content size error: %v", err)
-		return m.viewErr("terminal size too small", containerAvailableSize)
+		return m.viewErr(fmt.Errorf("terminal size too small"), containerAvailableSize)
 	}
+
+	content, err := m.getContent(containerAvailableSize)
+	if err != nil {
+		return m.viewErr(err, containerAvailableSize)
+	}
+
+	renderedContainer := m.containerStyle.
+		Width(containerContentSize.Width).
+		Height(containerContentSize.Height).
+		Render(content)
+
+	return lipgloss.Place(
+		containerAvailableSize.Width,
+		containerAvailableSize.Height,
+		lipgloss.Center,
+		lipgloss.Center,
+		renderedContainer,
+	)
+}
+
+func (m Model) getContent(containerAvailableSize types.Size) (string, error) {
 	containerContentAvailableSize, err := layout.GetStyleContentAvailableSize(
 		m.containerStyle,
 		containerAvailableSize,
 	)
 	if err != nil {
 		log.Printf("get container content available size error: %v", err)
-		return m.viewErr("terminal size too small", containerAvailableSize)
+		return "", fmt.Errorf("terminal size too small")
 	}
 
 	m.title.AvailableSize = containerContentAvailableSize
-	renderedTitle := m.title.View()
-	if renderedTitle == "" {
-		return m.viewErr("title rendering error", containerAvailableSize)
+	renderedTitle, err := m.title.View()
+	if err != nil {
+		log.Printf("title rendering error: %v", err)
+		return "", fmt.Errorf("title rendering error")
 	}
 
 	var renderedSearch string
 
 	m.footer.AvailableSize = containerContentAvailableSize
-	renderedFooter := m.footer.View()
-	if renderedFooter == "" {
-		return m.viewErr("footer rendering error", containerAvailableSize)
+	renderedFooter, err := m.footer.View()
+	if err != nil {
+		log.Printf("footer rendering error: %v", err)
+		return "", fmt.Errorf("footer rendering error")
 	}
 
 	var containerContentFreeHeight int
 	if m.search != nil {
 		m.search.AvailableSize = containerContentAvailableSize
-		renderedSearch = m.search.View()
-		if renderedSearch == "" {
-			return m.viewErr("search rendering error", containerAvailableSize)
+		renderedSearch, err = m.search.View()
+		if err != nil {
+			log.Printf("search rendering error: %v", err)
+			return "", fmt.Errorf("search rendering error")
 		}
 
 		containerContentFreeHeight = containerContentAvailableSize.Height -
@@ -64,47 +104,36 @@ func (m Model) View() string {
 	}
 
 	m.menu.AvailableSize = containerContentFreeSize
-	renderedMenu := m.menu.View()
-	if renderedMenu == "" {
-		return m.viewErr("menu rendering error", containerAvailableSize)
+	renderedMenu, err := m.menu.View()
+	if err != nil {
+		log.Printf("menu rendering error: %v", err)
+		return "", fmt.Errorf("menu rendering error")
 	}
 
-	var joinedContent string
 	if m.search != nil {
-		joinedContent = lipgloss.JoinVertical(
+		return lipgloss.JoinVertical(
 			lipgloss.Center,
 			renderedTitle,
 			renderedSearch,
 			renderedMenu,
 			renderedFooter,
-		)
-	} else {
-		joinedContent = lipgloss.JoinVertical(
-			lipgloss.Center,
-			renderedTitle,
-			renderedMenu,
-			renderedFooter,
-		)
+		), nil
 	}
-
-	renderedContainer := m.containerStyle.
-		Width(containerContentSize.Width).
-		Height(containerContentSize.Height).
-		Render(joinedContent)
-
-	return lipgloss.Place(
-		containerAvailableSize.Width,
-		containerAvailableSize.Height,
+	return lipgloss.JoinVertical(
 		lipgloss.Center,
-		lipgloss.Center,
-		renderedContainer,
-	)
+		renderedTitle,
+		renderedMenu,
+		renderedFooter,
+	), nil
 }
 
-func (m Model) viewErr(err string, size types.Size) string {
+func (m Model) viewErr(err error, size types.Size) string {
+	utils.AssertErr(err)
 	renderedErr := m.errorStyle.
 		Width(size.Width).
-		Render(err)
+		Height(size.Height).
+		Align(lipgloss.Center, lipgloss.Center).
+		Render(err.Error())
 
 	return lipgloss.Place(
 		size.Width,

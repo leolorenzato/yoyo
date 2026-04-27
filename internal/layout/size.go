@@ -5,7 +5,7 @@ import (
 	"strings"
 	"yoyo/internal/components/types"
 
-	"github.com/charmbracelet/lipgloss"
+	"charm.land/lipgloss/v2"
 	"github.com/charmbracelet/x/ansi"
 )
 
@@ -58,6 +58,8 @@ func GetStyleContentAvailableWidth(
 		return 0, err
 	}
 	aw := w -
+		s.GetBorderLeftSize() -
+		s.GetBorderRightSize() -
 		s.GetPaddingLeft() -
 		s.GetPaddingRight()
 	if aw < 0 {
@@ -73,9 +75,7 @@ func GetStyleContentWidth(
 ) (int, error) {
 	w := availableWidth -
 		s.GetMarginLeft() -
-		s.GetMarginRight() -
-		s.GetBorderLeftSize() -
-		s.GetBorderRightSize()
+		s.GetMarginRight()
 	if w < 0 {
 		return 0, fmt.Errorf("invalid width %d", w)
 	}
@@ -92,6 +92,8 @@ func GetStyleContentAvailableHeight(
 		return 0, err
 	}
 	ah := h -
+		s.GetBorderTopSize() -
+		s.GetBorderBottomSize() -
 		s.GetPaddingTop() -
 		s.GetPaddingBottom()
 	if ah < 0 {
@@ -107,9 +109,7 @@ func GetStyleContentHeight(
 ) (int, error) {
 	h := availableHeight -
 		s.GetMarginTop() -
-		s.GetMarginBottom() -
-		s.GetBorderTopSize() -
-		s.GetBorderBottomSize()
+		s.GetMarginBottom()
 	if h < 0 {
 		return 0, fmt.Errorf("invalid height %d", h)
 	}

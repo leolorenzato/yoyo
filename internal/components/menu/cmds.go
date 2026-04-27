@@ -4,7 +4,7 @@ import (
 	"log"
 	"yoyo/internal/execx"
 
-	tea "github.com/charmbracelet/bubbletea"
+	tea "charm.land/bubbletea/v2"
 )
 
 func LaunchCmd(cmdText string) tea.Cmd {

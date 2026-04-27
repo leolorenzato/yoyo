@@ -1,29 +1,35 @@
 package menu
 
 import (
-	"log"
 	"slices"
 	"yoyo/internal/layout"
 
-	"github.com/charmbracelet/lipgloss"
+	"charm.land/lipgloss/v2"
 )
 
-func (m Model) View() string {
+func (m Model) View() (string, error) {
 	rendered, err := m.render()
-	if err != nil {
-		log.Printf("menu render error: %v", err)
-		return ""
-	}
-
-	return rendered
-}
-
-func (m Model) render() (string, error) {
-	contentSize, err := layout.GetStyleContentSize(m.ContainerStyle, m.AvailableSize)
 	if err != nil {
 		return "", err
 	}
-	availableContentSize, err := layout.GetStyleContentAvailableSize(m.ContainerStyle, m.AvailableSize)
+
+	return rendered, nil
+}
+
+func (m Model) render() (string, error) {
+	availableSize, err := m.getAvailableSize()
+	if err != nil {
+		return "", err
+	}
+
+	contentSize, err := layout.GetStyleContentSize(m.ContainerStyle, availableSize)
+	if err != nil {
+		return "", err
+	}
+	availableContentSize, err := layout.GetStyleContentAvailableSize(
+		m.ContainerStyle,
+		availableSize,
+	)
 	if err != nil {
 		return "", err
 	}
@@ -67,12 +73,24 @@ func (m Model) render() (string, error) {
 }
 
 func (m Model) renderMenuItem(item Item, itemIndex int) (string, error) {
-	availableContentWidth, err := layout.GetStyleContentAvailableWidth(m.ContainerStyle, m.AvailableSize.Width)
+	availableSize, err := m.getAvailableSize()
+	if err != nil {
+		return "", err
+	}
+
+	availableContentWidth, err := layout.GetStyleContentAvailableWidth(
+		m.ContainerStyle,
+		availableSize.Width,
+	)
 	if err != nil {
 		return "", err
 	}
 	text := item.Icon + " " + item.Name
-	truncText := layout.Truncate(layout.StripNonSpaceWhitespace(text), availableContentWidth, "...")
+	truncText := layout.Truncate(
+		layout.StripNonSpaceWhitespace(text),
+		availableContentWidth,
+		"...",
+	)
 	if itemIndex == m.cursor {
 		return m.SelectedItemStyle.Render(truncText), nil
 	}

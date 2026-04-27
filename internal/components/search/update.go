@@ -1,18 +1,22 @@
 package search
 
-import tea "github.com/charmbracelet/bubbletea"
+import (
+	"yoyo/internal/components/types"
 
-func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+	tea "charm.land/bubbletea/v2"
+)
+
+func (m Model) Update(msg tea.Msg) (types.InternalModel, tea.Cmd) {
 	switch msg := msg.(type) {
-	case tea.KeyMsg:
-		switch msg.Type {
-		case tea.KeyBackspace:
+	case tea.KeyPressMsg:
+		switch {
+		case msg.Code == tea.KeyBackspace:
 			if len(m.SearchText) > 0 {
 				m.SearchText = m.SearchText[:len(m.SearchText)-1]
 				return m, func() tea.Msg { return SearchChangeMsg{Query: m.SearchText} }
 			}
-		case tea.KeyRunes:
-			m.SearchText += string(msg.Runes)
+		case msg.Text != "":
+			m.SearchText += string(msg.Text)
 			return m, func() tea.Msg { return SearchChangeMsg{Query: m.SearchText} }
 		}
 	}

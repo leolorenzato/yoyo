@@ -4,9 +4,10 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"runtime/debug"
 	"yoyo/internal/components/menu"
 
-	tea "github.com/charmbracelet/bubbletea"
+	tea "charm.land/bubbletea/v2"
 )
 
 func getLogFile() (*os.File, error) {
@@ -33,4 +34,27 @@ func getItemsFromCfg(cfg []ItemCfg) []menu.Item {
 	}
 
 	return items
+}
+
+func printVersion() {
+	version := "unknown"
+	commit := "unknown"
+	buildTime := "unknown"
+	goVersion := "unknown"
+	if info, ok := debug.ReadBuildInfo(); ok {
+		version = info.Main.Version
+		goVersion = info.GoVersion
+		for _, setting := range info.Settings {
+			switch setting.Key {
+			case "vcs.revision":
+				commit = setting.Value
+			case "vcs.time":
+				buildTime = setting.Value
+			}
+		}
+	}
+	fmt.Printf("Version: %s\n", version)
+	fmt.Printf("Commit: %s\n", commit)
+	fmt.Printf("Build time: %s\n", buildTime)
+	fmt.Printf("Go version: %s\n", goVersion)
 }

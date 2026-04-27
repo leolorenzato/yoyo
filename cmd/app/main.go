@@ -6,12 +6,11 @@ import (
 	"io"
 	"log"
 	"os"
-	"runtime/debug"
 	"yoyo/internal/app"
 	"yoyo/internal/theme"
 
+	tea "charm.land/bubbletea/v2"
 	"github.com/BurntSushi/toml"
-	tea "github.com/charmbracelet/bubbletea"
 )
 
 const appName string = "yoyo"
@@ -19,6 +18,7 @@ const appName string = "yoyo"
 func main() {
 	version := flag.Bool("version", false, "print version information")
 	cfgPath := flag.String("c", "", "path to configuration file (required)")
+	dryRun := flag.Bool("dry-run", false, "dry run mode")
 	debug := flag.Bool("debug", false, "debug mode")
 	flag.Parse()
 
@@ -52,10 +52,11 @@ func main() {
 		getItemsFromCfg(cfg.Items),
 		styles,
 		cfg.App.Title,
-		cfg.App.EnableSearch)
+		cfg.App.EnableSearch,
+		*dryRun,
+	)
 	p := tea.NewProgram(
 		model,
-		tea.WithAltScreen(),
 	)
 	if _, err := p.Run(); err != nil {
 		log.Printf("error: %v", err)
@@ -68,27 +69,4 @@ func requireStringFlag(value *string, name string) {
 		fmt.Fprintf(os.Stderr, "%s is required\n", name)
 		os.Exit(1)
 	}
-}
-
-func printVersion() {
-	version := "unknown"
-	commit := "unknown"
-	buildTime := "unknown"
-	goVersion := "unknown"
-	if info, ok := debug.ReadBuildInfo(); ok {
-		version = info.Main.Version
-		goVersion = info.GoVersion
-		for _, setting := range info.Settings {
-			switch setting.Key {
-			case "vcs.revision":
-				commit = setting.Value
-			case "vcs.time":
-				buildTime = setting.Value
-			}
-		}
-	}
-	fmt.Printf("Version: %s\n", version)
-	fmt.Printf("Commit: %s\n", commit)
-	fmt.Printf("Build time: %s\n", buildTime)
-	fmt.Printf("Go version: %s\n", goVersion)
 }

@@ -1,30 +1,37 @@
 package title
 
 import (
-	"log"
 	"yoyo/internal/layout"
 )
 
-func (m Model) View() string {
+func (m Model) View() (string, error) {
 	rendered, err := m.render()
 	if err != nil {
-		log.Printf("title render error: %v", err)
-		return ""
+		return "", err
 	}
 
-	return rendered
+	return rendered, nil
 }
 
 func (m Model) render() (string, error) {
-	contentSize, err := layout.GetStyleContentSize(m.Style, m.AvailableSize)
+	availableSize, err := m.getAvailableSize()
 	if err != nil {
 		return "", err
 	}
-	availableContentSize, err := layout.GetStyleContentAvailableSize(m.Style, m.AvailableSize)
+
+	contentSize, err := layout.GetStyleContentSize(m.Style, availableSize)
 	if err != nil {
 		return "", err
 	}
-	truncText := layout.Truncate(layout.StripNonSpaceWhitespace(m.text), availableContentSize.Width, "")
+	availableContentSize, err := layout.GetStyleContentAvailableSize(m.Style, availableSize)
+	if err != nil {
+		return "", err
+	}
+	truncText := layout.Truncate(
+		layout.StripNonSpaceWhitespace(m.text),
+		availableContentSize.Width,
+		"",
+	)
 
 	return (m.Style.
 		Width(contentSize.Width).
