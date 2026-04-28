@@ -38,7 +38,7 @@
 
 ```toml
 [app]
-title = "User Panel 👤"
+title = "User Panel"
 enableSearch = true
 
 [[items]]
