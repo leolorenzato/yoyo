@@ -38,23 +38,28 @@
 
 ```toml
 [app]
-title = "Greetings 👋"
+title = "User Panel 👤"
 enableSearch = true
 
 [[items]]
-name = "hello"
-icon = "🇬🇧"
-cmd = """$TERMINAL -e $SHELL -c 'echo "Hello yoyo!🪀🚀"; exec $SHELL'"""
+name = "whoami"
+icon = "👤"
+cmd = """$TERMINAL -e $SHELL -c 'whoami; exec $SHELL'"""
 
 [[items]]
-name = "ciao"
-icon = "🇮🇹"
-cmd = """$TERMINAL -e $SHELL -c 'echo "Ciao yoyo!🪀🚀"; exec $SHELL'"""
+name = "system status"
+icon = "📊"
+cmd = """$TERMINAL -e $SHELL -c 'uptime; exec $SHELL'"""
 
 [[items]]
-name = "hola"
-icon = "🇪🇸"
-cmd = """$TERMINAL -e $SHELL -c 'echo "Hola yoyo!🪀🚀"; exec $SHELL'"""
+name = "disk usage"
+icon = "💽"
+cmd = """$TERMINAL -e $SHELL -c 'df -h; exec $SHELL'"""
+
+[[items]]
+name = "network"
+icon = "🌐"
+cmd = """$TERMINAL -e $SHELL -c 'ip a; exec $SHELL'"""
 ```
 
 ### 🎨 Theme Configuration
@@ -62,33 +67,33 @@ cmd = """$TERMINAL -e $SHELL -c 'echo "Hola yoyo!🪀🚀"; exec $SHELL'"""
 ```toml
 [theme.container]
 border = false
-borderColor = "#6C6F85"
+borderColor = "#6c6f85"
 borderRounded = true
 
 [theme.title]
 border = false
-borderColor = "#6C6F85"
+borderColor = "#6c6f85"
 borderRounded = true
-textColor = "#DDB6F2"
+textColor = "#f2cdcd"
 
 [theme.search]
 border = true
-borderColor = "#6C6F85"
+borderColor = "#6c6f85"
 borderRounded = true
-textColor = "#E0E0E0"
+textColor = "#e0e0e0"
 
 [theme.menu]
 border = true
-borderColor = "#6C6F85"
+borderColor = "#6c6f85"
 borderRounded = true
-textColor = "#E0E0E0"
-selectedItemTextColor = "#A6E3A1"
+textColor = "#e0e0e0"
+selectedItemTextColor = "#a6e3a1"
 
 [theme.footer]
 border = false
-borderColor = "#6C6F85"
+borderColor = "#6c6f85"
 borderRounded = true
-textColor = "#8F90A0"
+textColor = "#8f90a0"
 ```
 
 ## Hyprland
