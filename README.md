@@ -1,7 +1,6 @@
 # yoyo 🪀
 
 ![GitHub License](https://img.shields.io/github/license/leolorenzato/yoyo)
-[![Go Report Card](https://goreportcard.com/badge/github.com/leolorenzato/yoyo)](https://goreportcard.com/report/github.com/leolorenzato/yoyo)
 ![GitHub Release](https://img.shields.io/github/v/release/leolorenzato/yoyo)
 ![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/leolorenzato/yoyo)
 
